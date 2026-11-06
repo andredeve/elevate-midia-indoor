@@ -1,0 +1,50 @@
+/* ================================================================
+   ELEVATE MÍDIA INDOOR — LEADS MANAGEMENT SCOPED CONTROLS
+   ================================================================ */
+
+.lead-status-select {
+  height: 28px;
+  padding: 0 26px 0 9px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-weight: 500;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+  transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+}
+
+.lead-status-select option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.lead-status-select.pending_onboarding {
+  background-color: var(--warning-dim);
+  border-color: var(--warning-border);
+  color: var(--warning);
+}
+
+.lead-status-select.in_progress {
+  background-color: var(--info-dim);
+  border-color: var(--info-border);
+  color: var(--info);
+}
+
+.lead-status-select.activated {
+  background-color: var(--success-dim);
+  border-color: var(--success-border);
+  color: var(--success);
+}
+
+.lead-status-select.rejected {
+  background-color: var(--danger-dim);
+  border-color: var(--danger-border);
+  color: var(--danger);
+}
