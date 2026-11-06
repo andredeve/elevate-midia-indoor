@@ -1,10 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
 
-export const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://tdbruykbguiojwzrjzik.supabase.co';
-export const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkYnJ1eWtiZ3Vpb2p3enJqemlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM5NzM3MDgsImV4cCI6MjEwOTU0OTcwOH0.-0m_iv8k86UnJ7M8wkbeNxb5H5TGA5ZsFNfpDPxvZrI';
+const PROD_SUPABASE_URL = 'https://tdbruykbguiojwzrjzik.supabase.co';
+const PROD_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkYnJ1eWtiZ3Vpb2p3enJqemlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM5NzM3MDgsImV4cCI6MjEwOTU0OTcwOH0.-0m_iv8k86UnJ7M8wkbeNxb5H5TGA5ZsFNfpDPxvZrI';
 
-// Instância real do Supabase
-const realSupabase = createClient(supabaseUrl, supabaseAnonKey);
+const envUrl = import.meta.env.VITE_SUPABASE_URL;
+const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// Garante que variáveis antigas (ex: prlhdjpzflgjtlmknhps) não sobrescrevam o banco ativo
+export const supabaseUrl =
+  envUrl && envUrl.includes('tdbruykbguiojwzrjzik') ? envUrl : PROD_SUPABASE_URL;
+export const supabaseAnonKey =
+  envUrl && envUrl.includes('tdbruykbguiojwzrjzik') && envKey ? envKey : PROD_SUPABASE_ANON_KEY;
+
+// Instância real do Supabase (com lock no-op para evitar deadlock de navigator.locks / GoTrueClient no navegador)
+const realSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    lock: async (_name: string, _acquireTimeout: number, fn: () => Promise<any>) => {
+      return await fn();
+    },
+  },
+});
 
 // Utilitários para persistência local dos dados mockados
 const getMockData = (key: string, initial: any) => {

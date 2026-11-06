@@ -6,6 +6,8 @@ frontend:
         - nvm install 22
         - nvm use 22
         - npm install
+        - echo "VITE_SUPABASE_URL=https://tdbruykbguiojwzrjzik.supabase.co" > .env
+        - echo "VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkYnJ1eWtiZ3Vpb2p3enJqemlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM5NzM3MDgsImV4cCI6MjEwOTU0OTcwOH0.-0m_iv8k86UnJ7M8wkbeNxb5H5TGA5ZsFNfpDPxvZrI" >> .env
     build:
       commands:
         - npm run build
@@ -16,4 +18,5 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+
 
