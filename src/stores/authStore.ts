@@ -19,31 +19,43 @@ async function fetchUserRole(user: User): Promise<string> {
     (user.user_metadata?.role as string) ||
     'admin';
 
+  // Se o papel já estiver definido no metadata do token JWT, usa imediatamente sem bloquear no banco
+  const metaRole = (user.app_metadata?.role as string) || (user.user_metadata?.role as string);
+  if (metaRole && ['admin', 'operator', 'partner', 'advertiser'].includes(metaRole)) {
+    return metaRole;
+  }
+
   try {
-    const { data, error } = await supabase
+    const queryPromise = supabase
       .from('users')
       .select('role, org_id')
       .eq('id', user.id)
       .single();
 
+    const timeoutPromise = new Promise<{ data: null; error: { message: string } }>((resolve) =>
+      setTimeout(() => resolve({ data: null, error: { message: 'timeout' } }), 2500)
+    );
+
+    const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+
     if (data?.role) {
       return data.role;
     }
 
-    // Se o usuário existe no Auth mas ainda não possui linha em public.users, cria automaticamente
-    if (error || !data) {
+    // Se o usuário existe no Auth mas ainda não possui linha em public.users, cria em background
+    if (error && error.message !== 'timeout') {
       const orgId = (user.user_metadata?.org_id as string) || DEFAULT_ORG_ID;
       const name =
         (user.user_metadata?.name as string) ||
         (user.email ? user.email.split('@')[0] : 'Usuário');
 
-      await supabase.from('users').insert({
+      supabase.from('users').insert({
         id: user.id,
         org_id: orgId,
         email: user.email || '',
         name,
         role: fallbackRole,
-      });
+      }).then(() => {});
     }
 
     return fallbackRole;
@@ -119,14 +131,16 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ user: null, userRole: null, loading: false });
       });
 
-    // Sincroniza mudanças de sessão do Supabase Auth em tempo real
+    // Sincroniza mudanças de sessão do Supabase Auth em tempo real (sem async direto para não travar o lock interno do Supabase v2)
     if (!authSubscription) {
-      const { data } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
+      const { data } = supabase.auth.onAuthStateChange((event: string, session: any) => {
         if (event === 'SIGNED_OUT' || !session?.user) {
           set({ user: null, userRole: null, loading: false });
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-          const role = await fetchUserRole(session.user);
-          set({ user: session.user, userRole: role, loading: false });
+          setTimeout(async () => {
+            const role = await fetchUserRole(session.user);
+            set({ user: session.user, userRole: role, loading: false });
+          }, 0);
         }
       });
       authSubscription = data?.subscription || null;
