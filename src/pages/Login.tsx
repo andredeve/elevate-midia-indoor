@@ -43,8 +43,13 @@ export default function Login() {
       if (signInError) {
         setError(signInError || 'Credenciais inválidas. Tente novamente.');
         setLoading(false);
+        return;
       }
-      // Se deu certo, o useEffect ali em cima vai perceber a mudança do 'user' e redirecionar
+
+      // Redireciona imediatamente com base no papel retornado no store
+      const state = useAuthStore.getState();
+      const target = getHomeRoute(state.userRole);
+      navigate(target, { replace: true });
     } catch {
       setError('Erro inesperado. Tente novamente.');
       setLoading(false);
