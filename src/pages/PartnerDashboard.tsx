@@ -1,8 +1,9 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
 import { parsePartnerContactAndQuota } from '../utils/partnerQuota';
+import { isTerminalOnline } from '../utils/terminalStatus';
 import {
   Wallet,
   Users,
@@ -94,7 +95,7 @@ export default function PartnerDashboard() {
 
       const termList = terminals || [];
       setTerminalsList(termList);
-      const activeTerminals = termList.filter((t: any) => t.status === 'online').length || 0;
+      const activeTerminals = termList.filter((t: any) => isTerminalOnline(t)).length || 0;
 
       const termWithQuota = termList.find((t: any) => t.device_info?.partner_quota);
       const terminalQuota = termWithQuota?.device_info?.partner_quota ? Number(termWithQuota.device_info.partner_quota) : null;
@@ -415,7 +416,7 @@ export default function PartnerDashboard() {
           ) : (
             <div className="grid-auto">
               {terminalsList.map(t => {
-                const isOnline = t.status === 'online';
+                const isOnline = isTerminalOnline(t);
                 return (
                   <div
                     key={t.id}

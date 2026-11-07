@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
 import { parsePartnerContactAndQuota } from '../utils/partnerQuota';
+import { isTerminalOnline } from '../utils/terminalStatus';
 import {
   Upload,
   FileVideo,
@@ -589,9 +590,9 @@ export default function PartnerMedia() {
                         </option>
                       ))}
                     </select>
-                    <span className={`badge ${activeTerminal?.status === 'online' ? 'badge-success' : 'badge-danger'}`}>
-                      <span className={`status-dot ${activeTerminal?.status === 'online' ? 'online' : 'offline'}`} />
-                      {activeTerminal?.status === 'online' ? 'Online · Sync ativo' : 'Offline'}
+                    <span className={`badge ${isTerminalOnline(activeTerminal) ? 'badge-success' : 'badge-danger'}`}>
+                      <span className={`status-dot ${isTerminalOnline(activeTerminal) ? 'online' : 'offline'}`} />
+                      {isTerminalOnline(activeTerminal) ? 'Online · Sync ativo' : 'Offline'}
                     </span>
                   </div>
                 </div>

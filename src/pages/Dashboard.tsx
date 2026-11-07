@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
+import { isTerminalOnline } from '../utils/terminalStatus';
 import {
   MonitorPlay,
   Play,
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [lastLiveUpdate, setLastLiveUpdate] = useState<Date | null>(null);
   const [newPlaysCount, setNewPlaysCount] = useState(0);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
+  const [nowTick, setNowTick] = useState(() => Date.now());
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -49,7 +51,7 @@ export default function Dashboard() {
     }
     loadDashboardData();
 
-    // Inscrição em tempo real para novos logs de reprodução
+    // Inscrição em tempo real para novos logs de reprodução e status de terminais
     const subscription = supabase
       .channel('terminal-playback-logs')
       .on(
@@ -67,16 +69,30 @@ export default function Dashboard() {
           setNewPlaysCount((prev) => prev + 1);
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'terminals'
+        },
+        async () => {
+          const { data: terminalsData } = await supabase.from('terminals').select('*');
+          if (terminalsData) setTerminals(terminalsData);
+          setNowTick(Date.now());
+        }
+      )
       .subscribe();
 
+    const tickInterval = setInterval(() => setNowTick(Date.now()), 10000);
+
     return () => {
+      clearInterval(tickInterval);
       supabase.removeChannel(subscription);
     };
   }, []);
 
   const { filteredStats, ranking, weeklyChart, topMediaMax } = useMemo(() => {
-    const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
-
     const activeTerminals = selectedTerminalFilter
       ? terminals.filter((t: any) => t.id === selectedTerminalFilter)
       : terminals;
@@ -86,10 +102,8 @@ export default function Dashboard() {
       : logs;
 
     const total = activeTerminals.length;
-    const online = activeTerminals.filter((t: any) => t.status === 'online').length;
-    const activeNow = activeTerminals.filter(
-      (t: any) => t.last_seen_at && new Date(t.last_seen_at) > threeMinutesAgo
-    ).length;
+    const online = activeTerminals.filter((t: any) => isTerminalOnline(t, nowTick)).length;
+    const activeNow = online;
     const totalPlays = selectedTerminalFilter
       ? filteredLogs.length
       : Math.max(totalPlaysDB, filteredLogs.length);
@@ -158,7 +172,7 @@ export default function Dashboard() {
       },
       topMediaMax
     };
-  }, [terminals, logs, selectedTerminalFilter, totalPlaysDB]);
+  }, [terminals, logs, selectedTerminalFilter, totalPlaysDB, nowTick]);
 
   return (
     <div>

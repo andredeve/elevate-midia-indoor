@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
+import { isTerminalOnline } from '../utils/terminalStatus';
 import {
   MonitorPlay,
   Clock,
@@ -62,6 +63,7 @@ export default function Terminals() {
     advertisement_text: ''
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [nowTick, setNowTick] = useState(() => Date.now());
   const { user } = useAuthStore();
 
   const loadTerminals = async () => {
@@ -86,7 +88,16 @@ export default function Terminals() {
       ]);
 
       if (termRes.data && !termRes.error) {
-        setTerminals(termRes.data as Terminal[]);
+        const list = termRes.data as Terminal[];
+        setTerminals(list);
+
+        // Se algum terminal estiver com status 'online' no banco mas sem heartbeat recente, corrige para 'offline' no banco
+        const now = Date.now();
+        list.forEach((t) => {
+          if (t.status === 'online' && !isTerminalOnline(t, now)) {
+            supabase.from('terminals').update({ status: 'offline' }).eq('id', t.id).then(() => {});
+          }
+        });
       }
       if (partRes.data) {
         setPartners(partRes.data as PartnerOption[]);
@@ -101,26 +112,44 @@ export default function Terminals() {
     const subscription = supabase
       .channel('terminals-status')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'terminals' }, () => {
+        setNowTick(Date.now());
         loadTerminals();
       })
       .subscribe();
 
+    // Reavalia periodicamente o timeout de heartbeat (a cada 10s) para detectar queda de conexão imediatamente
+    const tickInterval = setInterval(() => {
+      const now = Date.now();
+      setNowTick(now);
+      setTerminals((prev) => {
+        prev.forEach((t) => {
+          if (t.status === 'online' && !isTerminalOnline(t, now)) {
+            supabase.from('terminals').update({ status: 'offline' }).eq('id', t.id).then(() => {});
+          }
+        });
+        return [...prev];
+      });
+    }, 10000);
+
     return () => {
+      clearInterval(tickInterval);
       supabase.removeChannel(subscription);
     };
   }, [user]);
 
   const stats = useMemo(() => {
     const total = terminals.length;
-    const online = terminals.filter((t) => t.status === 'online').length;
+    const online = terminals.filter((t) => isTerminalOnline(t, nowTick)).length;
     const offline = total - online;
     const pinned = terminals.filter((t) => Boolean(t.device_info?.pinned_at)).length;
     return { total, online, offline, pinned };
-  }, [terminals]);
+  }, [terminals, nowTick]);
 
   const filteredTerminals = useMemo(() => {
     return terminals.filter((t) => {
-      if (statusFilter !== 'all' && t.status !== statusFilter) return false;
+      const online = isTerminalOnline(t, nowTick);
+      if (statusFilter === 'online' && !online) return false;
+      if (statusFilter === 'offline' && online) return false;
       const q = searchQuery.toLowerCase().trim();
       if (!q) return true;
       const partnerName =
@@ -131,7 +160,7 @@ export default function Terminals() {
         partnerName.toLowerCase().includes(q)
       );
     });
-  }, [terminals, statusFilter, searchQuery]);
+  }, [terminals, statusFilter, searchQuery, nowTick]);
 
   const handleOpenModal = (terminal?: Terminal) => {
     if (terminal) {
@@ -472,7 +501,7 @@ export default function Terminals() {
           }}
         >
           {filteredTerminals.map((terminal) => {
-            const isOnline = terminal.status === 'online';
+            const isOnline = isTerminalOnline(terminal, nowTick);
             const isPinned = Boolean(terminal.device_info?.pinned_at);
             const partnerLabel =
               terminal.partners?.establishment_name ||

@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, type FormEvent, type ChangeEvent } from '
 import { createClient } from '@supabase/supabase-js';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../lib/supabase';
 import { parsePartnerContactAndQuota, formatPartnerContactWithQuota } from '../utils/partnerQuota';
+import { isTerminalOnline } from '../utils/terminalStatus';
 import {
   Users,
   Copy,
@@ -331,7 +332,7 @@ export default function PartnerManagement() {
       // 1. Terminais vinculados ao parceiro
       const { data: terms } = await supabase
         .from('terminals')
-        .select('id, name, location, status, device_info')
+        .select('id, name, location, status, last_sync_at, device_info')
         .eq('partner_id', partner.id);
 
       const loadedTerms = terms || [];
@@ -942,7 +943,7 @@ export default function PartnerManagement() {
                   const catName = partner.category || 'Comércio & Varejo';
                   const initial = estName.charAt(0).toUpperCase();
                   const partnerTerminals = allTerminals.filter(t => t.partner_id === partner.id);
-                  const onlineCount = partnerTerminals.filter(t => t.status === 'online').length;
+                  const onlineCount = partnerTerminals.filter(t => isTerminalOnline(t)).length;
 
                   return (
                     <tr key={partner.id}>
@@ -1767,7 +1768,7 @@ export default function PartnerManagement() {
       {/* MODAL 3: TERMINAIS VINCULADOS AO PARCEIRO */}
       {selectedPartnerForTerminals && (() => {
         const partnerTerminals = allTerminals.filter(t => t.partner_id === selectedPartnerForTerminals.id);
-        const onlineCount = partnerTerminals.filter(t => t.status === 'online').length;
+        const onlineCount = partnerTerminals.filter(t => isTerminalOnline(t)).length;
         const offlineCount = partnerTerminals.length - onlineCount;
 
         const filteredTerminals = partnerTerminals.filter(t => {
@@ -1775,8 +1776,10 @@ export default function PartnerManagement() {
             !terminalSearchQuery ||
             t.name?.toLowerCase().includes(terminalSearchQuery.toLowerCase()) ||
             t.location?.toLowerCase().includes(terminalSearchQuery.toLowerCase());
+          const online = isTerminalOnline(t);
           const matchStatus =
-            terminalStatusFilter === 'all' || t.status === terminalStatusFilter;
+            terminalStatusFilter === 'all' ||
+            (terminalStatusFilter === 'online' ? online : !online);
           return matchQuery && matchStatus;
         });
 
@@ -1893,7 +1896,7 @@ export default function PartnerManagement() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {filteredTerminals.map(t => {
-                      const isOnline = t.status === 'online';
+                      const isOnline = isTerminalOnline(t);
                       return (
                         <div
                           key={t.id}
