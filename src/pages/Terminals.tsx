@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useMemo, type FormEvent } from 'react';
+import { useEffect, useState, useMemo, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
 import {
@@ -57,6 +57,7 @@ export default function Terminals() {
     location: '',
     partner_id: '',
     show_info_bar: true,
+    show_partner_badge: true,
     establishment_name: '',
     advertisement_text: ''
   });
@@ -141,6 +142,7 @@ export default function Terminals() {
         location: terminal.location || '',
         partner_id: terminal.partner_id || '',
         show_info_bar: devInfo.show_info_bar !== false,
+        show_partner_badge: devInfo.show_partner_badge !== false,
         establishment_name: devInfo.establishment_name || '',
         advertisement_text: devInfo.advertisement_text || ''
       });
@@ -151,6 +153,7 @@ export default function Terminals() {
         location: '',
         partner_id: '',
         show_info_bar: true,
+        show_partner_badge: true,
         establishment_name: '',
         advertisement_text: ''
       });
@@ -175,11 +178,13 @@ export default function Terminals() {
         ? {
             ...(editingTerminal.device_info || {}),
             show_info_bar: formData.show_info_bar,
+            show_partner_badge: formData.show_partner_badge,
             establishment_name: formData.establishment_name,
             advertisement_text: formData.advertisement_text
           }
         : {
             show_info_bar: formData.show_info_bar,
+            show_partner_badge: formData.show_partner_badge,
             establishment_name: formData.establishment_name,
             advertisement_text: formData.advertisement_text
           };
@@ -586,6 +591,24 @@ export default function Terminals() {
                         : 'Nunca'}
                     </span>
                   </div>
+
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <MonitorPlay size={12} />
+                      Selo Conteúdo Interno
+                    </span>
+                    <span
+                      style={{
+                        color:
+                          terminal.device_info?.show_partner_badge !== false
+                            ? 'var(--success)'
+                            : 'var(--text-tertiary)',
+                        fontWeight: 500
+                      }}
+                    >
+                      {terminal.device_info?.show_partner_badge !== false ? 'Ativado' : 'Oculto'}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Footer Controls */}
@@ -712,6 +735,29 @@ export default function Terminals() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                {/* Switch Notificação de Conteúdo Interno do Parceiro */}
+                <div
+                  className="toggle-row"
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      show_partner_badge: !formData.show_partner_badge
+                    })
+                  }
+                >
+                  <div>
+                    <div className="toggle-label">
+                      Notificação de Conteúdo Interno (Mídias do Parceiro)
+                    </div>
+                    <div className="toggle-desc">
+                      Exibe o selo &ldquo;CONTEÚDO INTERNO — Mídia do Parceiro&rdquo; na TV durante a reprodução das mídias exclusivas do estabelecimento
+                    </div>
+                  </div>
+                  <div className={`toggle-track ${formData.show_partner_badge ? 'on' : ''}`}>
+                    <div className="toggle-thumb" />
+                  </div>
                 </div>
 
                 {/* Switch Barra de Informações */}
