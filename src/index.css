@@ -932,6 +932,37 @@ button, input, select, textarea { font-family: inherit; }
   width: 100%;
 }
 
+/* Partner Grids: Fixed max-width without horizontal or internal scrolling */
+.partner-grid-card {
+  width: 100%;
+  max-width: 1240px;
+  overflow: hidden;
+}
+
+.partner-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.partner-table,
+.partner-grade-table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.partner-table th,
+.partner-table td,
+.partner-grade-table th,
+.partner-grade-table td {
+  padding: 11px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
 .data-table,
 .table {
   width: 100%;
@@ -1917,18 +1948,55 @@ select.input-field option,
   .segmented-control,
   .filter-pills {
     width: 100%;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .segmented-control::-webkit-scrollbar,
-  .filter-pills::-webkit-scrollbar {
-    display: none;
+    flex-wrap: wrap;
+    overflow: hidden;
   }
   .seg-btn {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     justify-content: center;
+  }
+
+  /* Partner tables/grids on mobile & tablet: fixed width, zero scrolling */
+  .partner-table thead,
+  .partner-grade-table thead {
+    display: none;
+  }
+  .partner-table,
+  .partner-table tbody,
+  .partner-grade-table,
+  .partner-grade-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .partner-table tbody tr,
+  .partner-grade-table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    width: 100%;
+    max-width: 100%;
+  }
+  .partner-table tbody tr td,
+  .partner-grade-table tbody tr td {
+    padding: 0;
+    border-bottom: none;
+    width: auto;
+    max-width: 100%;
+  }
+  .partner-table tbody tr td:first-child,
+  .partner-table tbody tr td:last-child,
+  .partner-grade-table tbody tr td:nth-child(3),
+  .partner-grade-table tbody tr td[colspan] {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+  .partner-table tbody tr td:last-child > div {
+    justify-content: flex-start !important;
+    width: 100%;
   }
 
   .card-header {

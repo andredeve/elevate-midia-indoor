@@ -295,7 +295,7 @@ export default function PartnerAdvertisers() {
       </div>
 
       {/* Table Card */}
-      <div className="card table-card">
+      <div className="card table-card partner-grid-card" style={{ maxWidth: '1100px', overflow: 'hidden' }}>
         {advertisers.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">
@@ -312,8 +312,8 @@ export default function PartnerAdvertisers() {
             <div className="empty-state-desc">Nenhum anunciante corresponde à busca &quot;{searchQuery}&quot;.</div>
           </div>
         ) : (
-          <div className="table-scroll">
-          <table className="data-table">
+          <div className="partner-table-wrap">
+          <table className="data-table partner-table">
             <thead>
               <tr>
                 <th>Empresa / Razão Social</th>

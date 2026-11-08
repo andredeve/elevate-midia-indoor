@@ -456,7 +456,7 @@ export default function PartnerCommissions() {
 
       {/* TAB CONTENT: COMISSIONS TABLE */}
       {activeTab !== 'withdrawals' && (
-        <div className="card table-card">
+        <div className="card table-card partner-grid-card" style={{ maxWidth: '1100px', overflow: 'hidden' }}>
           {commissions.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state-icon">
@@ -473,8 +473,8 @@ export default function PartnerCommissions() {
               <div className="empty-state-desc">Nenhuma comissão corresponde ao filtro atual.</div>
             </div>
           ) : (
-            <div className="table-scroll">
-            <table className="data-table">
+            <div className="partner-table-wrap">
+            <table className="data-table partner-table">
               <thead>
                 <tr>
                   <th>Anunciante / Descrição</th>
@@ -554,7 +554,7 @@ export default function PartnerCommissions() {
 
       {/* TAB CONTENT: WITHDRAWALS TABLE */}
       {activeTab === 'withdrawals' && (
-        <div className="card table-card">
+        <div className="card table-card partner-grid-card" style={{ maxWidth: '1100px', overflow: 'hidden' }}>
           {withdrawals.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state-icon">
@@ -566,8 +566,8 @@ export default function PartnerCommissions() {
               </div>
             </div>
           ) : (
-            <div className="table-scroll">
-            <table className="data-table">
+            <div className="partner-table-wrap">
+            <table className="data-table partner-table">
               <thead>
                 <tr>
                   <th>Protocolo & Chave PIX</th>

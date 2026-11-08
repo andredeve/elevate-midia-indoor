@@ -414,7 +414,13 @@ export default function PartnerDashboard() {
               </div>
             </div>
           ) : (
-            <div className="grid-auto">
+            <div
+              className="grid-auto"
+              style={{
+                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 340px))',
+                maxWidth: '1060px'
+              }}
+            >
               {terminalsList.map(t => {
                 const isOnline = isTerminalOnline(t);
                 return (

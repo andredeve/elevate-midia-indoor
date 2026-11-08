@@ -715,10 +715,12 @@ export default function PartnerMedia() {
         </div>
       ) : (
         <div
+          className="partner-media-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 270px), 1fr))',
-            gap: '14px'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 290px))',
+            gap: '14px',
+            maxWidth: '920px'
           }}
         >
           {filteredMedia.map(file => {

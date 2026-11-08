@@ -905,7 +905,7 @@ export default function PartnerManagement() {
       </div>
 
       {/* Partners Table */}
-      <div className="table-card">
+      <div className="table-card partner-grid-card" style={{ maxWidth: '1240px', overflow: 'hidden' }}>
         {loading ? (
           <div className="loading-state">
             <div className="loader" />
@@ -924,16 +924,16 @@ export default function PartnerManagement() {
             </div>
           </div>
         ) : (
-          <div className="table-scroll">
-            <table className="data-table">
+          <div className="partner-table-wrap">
+            <table className="data-table partner-table">
               <thead>
                 <tr>
-                  <th>Estabelecimento</th>
-                  <th>Audiência (Mídia Kit)</th>
-                  <th>Terminais</th>
-                  <th>Localização & Contato</th>
-                  <th>Comissão & Código</th>
-                  <th style={{ textAlign: 'right' }}>Ações</th>
+                  <th style={{ width: '24%' }}>Estabelecimento</th>
+                  <th style={{ width: '15%' }}>Audiência (Mídia Kit)</th>
+                  <th style={{ width: '13%' }}>Terminais</th>
+                  <th style={{ width: '17%' }}>Localização & Contato</th>
+                  <th style={{ width: '15%' }}>Comissão & Código</th>
+                  <th style={{ width: '16%', textAlign: 'right' }}>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -1048,7 +1048,7 @@ export default function PartnerManagement() {
 
                       {/* Ações */}
                       <td style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', flexWrap: 'wrap' }}>
                           <button
                             type="button"
                             className="btn btn-secondary btn-sm"
@@ -2126,26 +2126,24 @@ export default function PartnerManagement() {
 
                   {/* GRID ÚNICA PADRONIZADA COM SEGMENTAÇÃO DE PLAYLIST E VÍDEOS */}
                   <div
-                    className="table-container"
+                    className="partner-table-wrap"
                     style={{
                       border: '1px solid var(--border-subtle)',
                       borderRadius: 'var(--radius-md)',
-                      maxHeight: '440px',
-                      overflowY: 'auto',
-                      overflowX: 'auto'
+                      overflow: 'hidden'
                     }}
                   >
-                    <table className="table" style={{ margin: 0 }}>
+                    <table className="table partner-grade-table" style={{ margin: 0, tableLayout: 'fixed', width: '100%' }}>
                       <thead>
                         <tr>
-                          <th style={{ width: '55px', whiteSpace: 'nowrap' }}>Ordem</th>
-                          <th style={{ width: '85px', whiteSpace: 'nowrap' }}>Prévia</th>
+                          <th style={{ width: '52px' }}>Ordem</th>
+                          <th style={{ width: '76px' }}>Prévia</th>
                           <th>Mídia / Conteúdo</th>
-                          <th style={{ width: '150px', whiteSpace: 'nowrap' }}>Segmento</th>
-                          <th style={{ width: '130px', whiteSpace: 'nowrap' }}>Terminal</th>
-                          <th style={{ width: '85px', whiteSpace: 'nowrap' }}>Duração</th>
-                          <th style={{ width: '155px', whiteSpace: 'nowrap' }}>Status na TV</th>
-                          <th style={{ width: '95px', textAlign: 'right', whiteSpace: 'nowrap' }}>Ação</th>
+                          <th style={{ width: '135px' }}>Segmento</th>
+                          <th style={{ width: '110px' }}>Terminal</th>
+                          <th style={{ width: '72px' }}>Duração</th>
+                          <th style={{ width: '135px' }}>Status na TV</th>
+                          <th style={{ width: '88px', textAlign: 'right' }}>Ação</th>
                         </tr>
                       </thead>
                       <tbody>
