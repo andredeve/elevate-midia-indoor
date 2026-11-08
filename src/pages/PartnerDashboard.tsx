@@ -15,7 +15,8 @@ import {
   Clock,
   Briefcase,
   ArrowRight,
-  Film
+  Film,
+  RefreshCw
 } from 'lucide-react';
 
 interface PartnerData {
@@ -186,6 +187,46 @@ export default function PartnerDashboard() {
       navigator.clipboard.writeText(partner.referral_code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleRebootTerminal = async (terminal: any) => {
+    if (!terminal) return;
+    if (
+      !confirm(
+        `Tem certeza que deseja forçar a reinicialização da TV "${terminal.name}"?`
+      )
+    )
+      return;
+
+    const currentDeviceInfo = terminal.device_info || {};
+
+    const { error } = await supabase
+      .from('terminals')
+      .update({
+        device_info: {
+          ...currentDeviceInfo,
+          force_reboot: true
+        }
+      })
+      .eq('id', terminal.id);
+
+    if (error) {
+      alert('Erro ao enviar comando de reinicialização: ' + error.message);
+    } else {
+      try {
+        await supabase.from('terminal_logs').insert({
+          terminal_id: terminal.id,
+          event_type: 'command_reboot',
+          metadata: { timestamp: new Date().toISOString(), action: 'force_reboot' }
+        });
+      } catch (logErr) {
+        console.error('Erro ao registrar log de reinicialização:', logErr);
+      }
+      alert(
+        `Comando de reinicialização enviado para "${terminal.name}". A TV reiniciará na próxima sincronização.`
+      );
+      await loadPartnerDashboard();
     }
   };
 
@@ -486,6 +527,37 @@ export default function PartnerDashboard() {
                         {t.advertisement_text}
                       </div>
                     )}
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '8px',
+                        paddingTop: '10px',
+                        borderTop: '1px solid var(--border-subtle)',
+                        marginTop: 'auto'
+                      }}
+                    >
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => handleRebootTerminal(t)}
+                        title="Forçar reinicialização remota do app"
+                      >
+                        <RefreshCw size={12} />
+                        <span>Reiniciar</span>
+                      </button>
+
+                      <Link
+                        to="/partner/media"
+                        className="btn btn-ghost btn-sm"
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <Film size={12} />
+                        <span>Gerenciar Mídias</span>
+                      </Link>
+                    </div>
                   </div>
                 );
               })}

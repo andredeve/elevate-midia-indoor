@@ -20,7 +20,9 @@ import {
   X,
   Plus,
   Film,
-  Image as ImageIcon
+  Image as ImageIcon,
+  RefreshCw,
+  PauseCircle
 } from 'lucide-react';
 
 interface MediaFile {
@@ -388,23 +390,118 @@ export default function PartnerMedia() {
   };
 
   const handleRemoveFromTerminal = async (mediaId: string) => {
-    const { error: updateErr } = await supabase
-      .from('media_files')
-      .update({ status: 'inactive' })
-      .eq('id', mediaId);
+    try {
+      // Remove também de playlist_items caso tenha sido vinculado diretamente
+      await supabase.from('playlist_items').delete().eq('media_id', mediaId);
 
-    if (updateErr) {
+      // A constraint media_files_status_check permite ('pending', 'approved', 'rejected').
+      // 'pending' retira a mídia da grade ativa da TV mantendo-a na biblioteca do parceiro.
+      const { error: updateErr } = await supabase
+        .from('media_files')
+        .update({ status: 'pending' })
+        .eq('id', mediaId);
+
+      if (updateErr) {
+        console.error('Erro ao remover mídia da TV:', updateErr);
+        alert('Erro ao remover mídia da TV: ' + updateErr.message);
+        return;
+      }
+
+      // Notificar terminal incrementando a versão da playlist
+      if (playlist?.id) {
+        const currentVersion = playlist.version || 1;
+        await supabase.from('playlists').update({ version: currentVersion + 1 }).eq('id', playlist.id);
+      }
+
+      await loadData();
+    } catch (err: any) {
+      console.error('Erro ao remover mídia da TV:', err);
       alert('Erro ao remover mídia da TV.');
+    }
+  };
+
+  const handleDeleteMedia = async (file: MediaFile) => {
+    const mediaName = file.name || file.original_name || 'esta mídia';
+    if (!confirm(`Tem certeza que deseja excluir permanentemente "${mediaName}"?`)) {
       return;
     }
 
-    // Notificar terminal incrementando a versão da playlist
-    if (playlist?.id) {
-      const currentVersion = playlist.version || 1;
-      await supabase.from('playlists').update({ version: currentVersion + 1 }).eq('id', playlist.id);
-    }
+    try {
+      await supabase.from('playlist_items').delete().eq('media_id', file.id);
 
-    await loadData();
+      const { error: delErr } = await supabase
+        .from('media_files')
+        .delete()
+        .eq('id', file.id);
+
+      if (delErr) {
+        console.error('Erro ao excluir mídia:', delErr);
+        alert('Erro ao excluir mídia: ' + delErr.message);
+        return;
+      }
+
+      if (file.file_path) {
+        try {
+          await supabase.storage.from('media').remove([file.file_path]);
+        } catch (storageErr) {
+          console.warn('Aviso ao remover arquivo do storage:', storageErr);
+        }
+      }
+
+      if (playlist?.id) {
+        const currentVersion = playlist.version || 1;
+        await supabase.from('playlists').update({ version: currentVersion + 1 }).eq('id', playlist.id);
+      }
+
+      if (previewMedia?.id === file.id) {
+        setPreviewMedia(null);
+      }
+
+      await loadData();
+    } catch (err: any) {
+      console.error('Erro ao excluir mídia:', err);
+      alert('Erro ao excluir mídia.');
+    }
+  };
+
+  const handleRebootTerminal = async (terminal: any) => {
+    if (!terminal) return;
+    if (
+      !confirm(
+        `Tem certeza que deseja forçar a reinicialização da TV "${terminal.name}"?`
+      )
+    )
+      return;
+
+    const currentDeviceInfo = terminal.device_info || {};
+
+    const { error } = await supabase
+      .from('terminals')
+      .update({
+        device_info: {
+          ...currentDeviceInfo,
+          force_reboot: true
+        }
+      })
+      .eq('id', terminal.id);
+
+    if (error) {
+      alert('Erro ao enviar comando de reinicialização: ' + error.message);
+    } else {
+      try {
+        await supabase.from('terminal_logs').insert({
+          terminal_id: terminal.id,
+          event_type: 'command_reboot',
+          metadata: { timestamp: new Date().toISOString(), action: 'force_reboot' }
+        });
+      } catch (logErr) {
+        console.error('Erro ao registrar log de reinicialização:', logErr);
+      }
+      alert(
+        `Comando de reinicialização enviado para "${terminal.name}". A TV reiniciará na próxima sincronização.`
+      );
+      await loadData();
+    }
   };
 
   const copyRlsSql = () => {
@@ -429,8 +526,8 @@ export default function PartnerMedia() {
         );
       default:
         return (
-          <span className="badge badge-warning" style={{ background: 'rgba(9,9,11,0.82)', backdropFilter: 'blur(6px)' }}>
-            Em análise
+          <span className="badge badge-neutral" style={{ background: 'rgba(9,9,11,0.82)', backdropFilter: 'blur(6px)' }}>
+            <PauseCircle size={11} /> Fora da Grade
           </span>
         );
     }
@@ -594,6 +691,17 @@ export default function PartnerMedia() {
                       <span className={`status-dot ${isTerminalOnline(activeTerminal) ? 'online' : 'offline'}`} />
                       {isTerminalOnline(activeTerminal) ? 'Online · Sync ativo' : 'Offline'}
                     </span>
+                    {activeTerminal && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => handleRebootTerminal(activeTerminal)}
+                        title="Forçar reinicialização remota do app na TV"
+                      >
+                        <RefreshCw size={12} />
+                        <span>Reiniciar Terminal</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -870,29 +978,41 @@ export default function PartnerMedia() {
                       <span>Visualizar</span>
                     </button>
 
-                    {linkedTerminals.length > 0 && (
-                      inTv ? (
-                        <button
-                          type="button"
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleRemoveFromTerminal(file.id)}
-                        >
-                          <Trash2 size={12} />
-                          <span>Remover da TV</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="btn btn-primary btn-sm"
-                          onClick={() => handleAddToTerminal(file.id)}
-                          disabled={currentPartnerCount >= maxPartnerSlots}
-                          title={currentPartnerCount >= maxPartnerSlots ? 'Cota de 30% atingida' : 'Exibir na TV'}
-                        >
-                          <Plus size={12} />
-                          <span>Exibir na TV</span>
-                        </button>
-                      )
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {linkedTerminals.length > 0 && (
+                        inTv ? (
+                          <button
+                            type="button"
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleRemoveFromTerminal(file.id)}
+                            title="Retirar esta mídia da grade da TV"
+                          >
+                            <PauseCircle size={12} />
+                            <span>Remover da TV</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            onClick={() => handleAddToTerminal(file.id)}
+                            disabled={currentPartnerCount >= maxPartnerSlots}
+                            title={currentPartnerCount >= maxPartnerSlots ? 'Cota de 30% atingida' : 'Exibir na TV'}
+                          >
+                            <Plus size={12} />
+                            <span>Exibir na TV</span>
+                          </button>
+                        )
+                      )}
+
+                      <button
+                        type="button"
+                        className="icon-btn danger"
+                        onClick={() => handleDeleteMedia(file)}
+                        title="Excluir mídia permanentemente"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -965,7 +1085,16 @@ export default function PartnerMedia() {
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ color: 'var(--danger)' }}
+                  onClick={() => handleDeleteMedia(previewMedia)}
+                >
+                  <Trash2 size={14} />
+                  <span>Excluir Mídia</span>
+                </button>
                 <button type="button" className="btn btn-ghost" onClick={() => setPreviewMedia(null)}>
                   Fechar
                 </button>
@@ -979,7 +1108,7 @@ export default function PartnerMedia() {
                         setPreviewMedia(null);
                       }}
                     >
-                      <Trash2 size={14} />
+                      <PauseCircle size={14} />
                       <span>Remover da Grade</span>
                     </button>
                   ) : (
