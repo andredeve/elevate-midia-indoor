@@ -1,4 +1,4 @@
-﻿/* ════════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    Elevate Mídia Indoor — Opt-in Page / VIP Lead Capture (3 Meses Grátis)
    Brand Colors: #08080c background | #d932fc -> #8a08ff -> #3b01fd Elevate Gradient | #ffffff Text
    ════════════════════════════════════════════════════════════════ */
@@ -1213,4 +1213,232 @@
     display: none; /* esconde os pontos separadores em telas muito estreitas */
   }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   LIGHT MODE — PADRÃO CLARO PARA A PÁGINA DE TESTE GRÁTIS (/teste-gratis)
+   ════════════════════════════════════════════════════════════════ */
+html:not([data-theme="dark"]) .opt-root,
+html[data-theme="light"] .opt-root {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .opt-nav-tag,
+html[data-theme="light"] .opt-nav-tag,
+html:not([data-theme="dark"]) .opt-hero-badge,
+html[data-theme="light"] .opt-hero-badge,
+html:not([data-theme="dark"]) .opt-form-badge,
+html[data-theme="light"] .opt-form-badge {
+  background: rgba(124, 58, 237, 0.10);
+  border-color: rgba(124, 58, 237, 0.25);
+  color: #6d28d9;
+  box-shadow: none;
+}
+
+html:not([data-theme="dark"]) .opt-nav-login-btn,
+html[data-theme="light"] .opt-nav-login-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .opt-nav-login-btn:hover,
+html[data-theme="light"] .opt-nav-login-btn:hover {
+  border-color: #7c3aed;
+  color: #6d28d9;
+  background: rgba(124, 58, 237, 0.05);
+}
+
+html:not([data-theme="dark"]) .opt-hero-title,
+html[data-theme="light"] .opt-hero-title,
+html:not([data-theme="dark"]) .opt-section-title,
+html[data-theme="light"] .opt-section-title,
+html:not([data-theme="dark"]) .opt-final-title,
+html[data-theme="light"] .opt-final-title,
+html:not([data-theme="dark"]) .opt-form-title,
+html[data-theme="light"] .opt-form-title,
+html:not([data-theme="dark"]) .opt-benefit-content h4,
+html[data-theme="light"] .opt-benefit-content h4,
+html:not([data-theme="dark"]) .opt-author-info h5,
+html[data-theme="light"] .opt-author-info h5,
+html:not([data-theme="dark"]) .opt-reason-card h3,
+html[data-theme="light"] .opt-reason-card h3,
+html:not([data-theme="dark"]) .opt-step-card h3,
+html[data-theme="light"] .opt-step-card h3,
+html:not([data-theme="dark"]) .opt-faq-question,
+html[data-theme="light"] .opt-faq-question,
+html:not([data-theme="dark"]) .opt-modal-card h2,
+html[data-theme="light"] .opt-modal-card h2 {
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .opt-highlight,
+html[data-theme="light"] .opt-highlight {
+  color: #7c3aed;
+  text-shadow: none;
+}
+
+html:not([data-theme="dark"]) .opt-hero-subtitle,
+html[data-theme="light"] .opt-hero-subtitle,
+html:not([data-theme="dark"]) .opt-benefit-content p,
+html[data-theme="light"] .opt-benefit-content p,
+html:not([data-theme="dark"]) .opt-section-subtitle,
+html[data-theme="light"] .opt-section-subtitle,
+html:not([data-theme="dark"]) .opt-reason-card p,
+html[data-theme="light"] .opt-reason-card p,
+html:not([data-theme="dark"]) .opt-step-card p,
+html[data-theme="light"] .opt-step-card p,
+html:not([data-theme="dark"]) .opt-faq-answer,
+html[data-theme="light"] .opt-faq-answer,
+html:not([data-theme="dark"]) .opt-final-subtitle,
+html[data-theme="light"] .opt-final-subtitle,
+html:not([data-theme="dark"]) .opt-form-subtitle,
+html[data-theme="light"] .opt-form-subtitle,
+html:not([data-theme="dark"]) .opt-modal-card p,
+html[data-theme="light"] .opt-modal-card p {
+  color: #475569;
+}
+
+html:not([data-theme="dark"]) .opt-hero-subtitle strong,
+html[data-theme="light"] .opt-hero-subtitle strong {
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .opt-benefit-item,
+html[data-theme="light"] .opt-benefit-item,
+html:not([data-theme="dark"]) .opt-reason-card,
+html[data-theme="light"] .opt-reason-card,
+html:not([data-theme="dark"]) .opt-step-card,
+html[data-theme="light"] .opt-step-card,
+html:not([data-theme="dark"]) .opt-faq-item,
+html[data-theme="light"] .opt-faq-item,
+html:not([data-theme="dark"]) .opt-faq-item.open,
+html[data-theme="light"] .opt-faq-item.open,
+html:not([data-theme="dark"]) .opt-table-container,
+html[data-theme="light"] .opt-table-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+html:not([data-theme="dark"]) .opt-testimonial-box,
+html[data-theme="light"] .opt-testimonial-box {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06) 0%, #ffffff 100%);
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #7c3aed;
+}
+
+html:not([data-theme="dark"]) .opt-testimonial-text,
+html[data-theme="light"] .opt-testimonial-text {
+  color: #334155;
+}
+
+html:not([data-theme="dark"]) .opt-form-card,
+html[data-theme="light"] .opt-form-card,
+html:not([data-theme="dark"]) .opt-modal-card,
+html[data-theme="light"] .opt-modal-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10), 0 4px 16px rgba(124, 58, 237, 0.06);
+}
+
+html:not([data-theme="dark"]) .opt-label,
+html[data-theme="light"] .opt-label {
+  color: #334155;
+}
+
+html:not([data-theme="dark"]) .opt-input,
+html[data-theme="light"] .opt-input {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .opt-input:focus,
+html[data-theme="light"] .opt-input:focus {
+  background: #ffffff;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+html:not([data-theme="dark"]) .opt-radio-btn,
+html[data-theme="light"] .opt-radio-btn {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+html:not([data-theme="dark"]) .opt-radio-btn:hover,
+html[data-theme="light"] .opt-radio-btn:hover {
+  border-color: #7c3aed;
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .opt-radio-btn.active,
+html[data-theme="light"] .opt-radio-btn.active {
+  background: rgba(124, 58, 237, 0.10);
+  border-color: #7c3aed;
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .opt-table th,
+html[data-theme="light"] .opt-table th {
+  background: #f8fafc;
+  color: #0f172a;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+html:not([data-theme="dark"]) .opt-table td,
+html[data-theme="light"] .opt-table td {
+  color: #334155;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+html:not([data-theme="dark"]) .opt-table th.highlight-col,
+html[data-theme="light"] .opt-table th.highlight-col,
+html:not([data-theme="dark"]) .opt-table td.highlight-col,
+html[data-theme="light"] .opt-table td.highlight-col {
+  background: rgba(124, 58, 237, 0.05);
+  border-left-color: rgba(124, 58, 237, 0.18);
+  border-right-color: rgba(124, 58, 237, 0.18);
+}
+
+html:not([data-theme="dark"]) .opt-table th.highlight-col,
+html[data-theme="light"] .opt-table th.highlight-col,
+html:not([data-theme="dark"]) .opt-table td.positive,
+html[data-theme="light"] .opt-table td.positive {
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .opt-final-cta,
+html[data-theme="light"] .opt-final-cta {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, #ffffff 100%);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+html:not([data-theme="dark"]) .opt-code-box,
+html[data-theme="light"] .opt-code-box {
+  background: #f8fafc;
+  border-color: #7c3aed;
+}
+
+html:not([data-theme="dark"]) .opt-code-value,
+html[data-theme="light"] .opt-code-value {
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .opt-btn-secondary,
+html[data-theme="light"] .opt-btn-secondary {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .opt-footer,
+html[data-theme="light"] .opt-footer {
+  border-top: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
 

@@ -110,9 +110,10 @@ html[data-theme="dark"] {
 }
 
 /* ================================================================
-   LIGHT MODE DESIGN SYSTEM
+   LIGHT MODE DESIGN SYSTEM (DEFAULT)
    Inspirado no Stripe Dashboard / Linear Light / Vercel Geist Light
    ================================================================ */
+:root,
 html[data-theme="light"] {
   /* Monochrome Surfaces */
   --bg-base:         #f8fafc;

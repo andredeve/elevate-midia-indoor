@@ -1625,4 +1625,464 @@
   .lp-footer { padding: 3rem 1.25rem 1.5rem; }
 }
 
+.lp-nav-promo-btn {
+  color: #c084fc !important;
+  font-weight: 700 !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LIGHT MODE — PADRÃO CLARO PARA A LANDING PAGE
+   ════════════════════════════════════════════════════════════════ */
+html:not([data-theme="dark"]) .lp-root,
+html[data-theme="light"] .lp-root {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .lp-gradient-text,
+html[data-theme="light"] .lp-gradient-text {
+  background: linear-gradient(135deg, #c803fd 0%, #7c3aed 50%, #3b01fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+html:not([data-theme="dark"]) .lp-accent,
+html[data-theme="light"] .lp-accent,
+html:not([data-theme="dark"]) .lp-nav-promo-btn,
+html[data-theme="light"] .lp-nav-promo-btn {
+  color: #7c3aed !important;
+}
+
+/* Navbar Clara */
+html:not([data-theme="dark"]) .lp-nav-scrolled,
+html[data-theme="light"] .lp-nav-scrolled {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+}
+
+html:not([data-theme="dark"]) .lp-nav-logo-text,
+html[data-theme="light"] .lp-nav-logo-text,
+html:not([data-theme="dark"]) .lp-nav-mobile-toggle,
+html[data-theme="light"] .lp-nav-mobile-toggle {
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .lp-nav-links button,
+html[data-theme="light"] .lp-nav-links button,
+html:not([data-theme="dark"]) .lp-btn-ghost,
+html[data-theme="light"] .lp-btn-ghost,
+html:not([data-theme="dark"]) .lp-mobile-menu button,
+html[data-theme="light"] .lp-mobile-menu button,
+html:not([data-theme="dark"]) .lp-mobile-menu a,
+html[data-theme="light"] .lp-mobile-menu a {
+  color: #475569;
+}
+
+html:not([data-theme="dark"]) .lp-nav-links button:hover,
+html[data-theme="light"] .lp-nav-links button:hover,
+html:not([data-theme="dark"]) .lp-btn-ghost:hover,
+html[data-theme="light"] .lp-btn-ghost:hover,
+html:not([data-theme="dark"]) .lp-mobile-menu button:hover,
+html[data-theme="light"] .lp-mobile-menu button:hover,
+html:not([data-theme="dark"]) .lp-mobile-menu a:hover,
+html[data-theme="light"] .lp-mobile-menu a:hover {
+  color: #0f172a;
+  background: rgba(124, 58, 237, 0.08);
+}
+
+html:not([data-theme="dark"]) .lp-mobile-menu-open,
+html[data-theme="light"] .lp-mobile-menu-open {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+/* Hero Claro */
+html:not([data-theme="dark"]) .lp-hero-orb-1,
+html[data-theme="light"] .lp-hero-orb-1 {
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.10), transparent 70%);
+}
+
+html:not([data-theme="dark"]) .lp-hero-orb-2,
+html[data-theme="light"] .lp-hero-orb-2 {
+  background: radial-gradient(circle, rgba(217, 50, 252, 0.07), transparent 70%);
+}
+
+html:not([data-theme="dark"]) .lp-hero-orb-3,
+html[data-theme="light"] .lp-hero-orb-3 {
+  background: radial-gradient(circle, rgba(59, 1, 253, 0.07), transparent 70%);
+}
+
+html:not([data-theme="dark"]) .lp-hero-grid-overlay,
+html[data-theme="light"] .lp-hero-grid-overlay {
+  background-image:
+    linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+}
+
+html:not([data-theme="dark"]) .lp-hero-badge,
+html[data-theme="light"] .lp-hero-badge,
+html:not([data-theme="dark"]) .lp-section-tag,
+html[data-theme="light"] .lp-section-tag {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.22);
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .lp-hero-title,
+html[data-theme="light"] .lp-hero-title,
+html:not([data-theme="dark"]) .lp-section-header h2,
+html[data-theme="light"] .lp-section-header h2,
+html:not([data-theme="dark"]) .lp-two-col-text h2,
+html[data-theme="light"] .lp-two-col-text h2,
+html:not([data-theme="dark"]) .lp-cta-content h2,
+html[data-theme="light"] .lp-cta-content h2 {
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .lp-hero-subtitle,
+html[data-theme="light"] .lp-hero-subtitle,
+html:not([data-theme="dark"]) .lp-section-header p,
+html[data-theme="light"] .lp-section-header p,
+html:not([data-theme="dark"]) .lp-two-col-text > p,
+html[data-theme="light"] .lp-two-col-text > p,
+html:not([data-theme="dark"]) .lp-cta-content > p,
+html[data-theme="light"] .lp-cta-content > p {
+  color: #475569;
+}
+
+html:not([data-theme="dark"]) .lp-hero-subtitle strong,
+html[data-theme="light"] .lp-hero-subtitle strong {
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .lp-btn-outline,
+html[data-theme="light"] .lp-btn-outline {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+html:not([data-theme="dark"]) .lp-btn-outline:hover,
+html[data-theme="light"] .lp-btn-outline:hover {
+  border-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.05);
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .lp-hero-trust-item,
+html[data-theme="light"] .lp-hero-trust-item {
+  color: #475569;
+}
+
+html:not([data-theme="dark"]) .lp-hero-trust-item svg,
+html[data-theme="light"] .lp-hero-trust-item svg {
+  color: #059669;
+}
+
+/* Mockup Hero em Modo Claro */
+html:not([data-theme="dark"]) .lp-hero-screen,
+html[data-theme="light"] .lp-hero-screen {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12), 0 4px 16px rgba(124, 58, 237, 0.08);
+}
+
+html:not([data-theme="dark"]) .lp-hero-screen-header,
+html[data-theme="light"] .lp-hero-screen-header {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+html:not([data-theme="dark"]) .lp-hero-screen-url,
+html[data-theme="light"] .lp-hero-screen-url {
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+html:not([data-theme="dark"]) .lp-hero-dash-sidebar,
+html[data-theme="light"] .lp-hero-dash-sidebar {
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+}
+
+html:not([data-theme="dark"]) .lp-dash-nav-item,
+html[data-theme="light"] .lp-dash-nav-item {
+  color: #64748b;
+}
+
+html:not([data-theme="dark"]) .lp-dash-nav-active,
+html[data-theme="light"] .lp-dash-nav-active {
+  background: rgba(124, 58, 237, 0.10);
+  color: #6d28d9;
+  font-weight: 600;
+}
+
+html:not([data-theme="dark"]) .lp-dash-stat-card,
+html[data-theme="light"] .lp-dash-stat-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+html:not([data-theme="dark"]) .lp-dash-stat-value,
+html[data-theme="light"] .lp-dash-stat-value {
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .lp-dash-stat-label,
+html[data-theme="light"] .lp-dash-stat-label {
+  color: #64748b;
+}
+
+html:not([data-theme="dark"]) .lp-dash-chart-bar,
+html[data-theme="light"] .lp-dash-chart-bar {
+  background: rgba(124, 58, 237, 0.15);
+}
+
+/* Barra de Prova Social Clara */
+html:not([data-theme="dark"]) .lp-proof-bar,
+html[data-theme="light"] .lp-proof-bar {
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+}
+
+html:not([data-theme="dark"]) .lp-proof-number,
+html[data-theme="light"] .lp-proof-number {
+  background: linear-gradient(135deg, #0f172a 0%, #7c3aed 55%, #3b01fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+html:not([data-theme="dark"]) .lp-proof-label,
+html[data-theme="light"] .lp-proof-label {
+  color: #64748b;
+}
+
+html:not([data-theme="dark"]) .lp-proof-divider,
+html[data-theme="light"] .lp-proof-divider {
+  background: #e2e8f0;
+}
+
+/* Seções Alternadas Claras */
+html:not([data-theme="dark"]) .lp-section-dark,
+html[data-theme="light"] .lp-section-dark {
+  background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
+  border-top: 1px solid rgba(15, 23, 42, 0.05);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+/* Cards Bento, Passos, Mockups, Depoimentos, Planos e FAQ */
+html:not([data-theme="dark"]) .lp-bento-card,
+html[data-theme="light"] .lp-bento-card,
+html:not([data-theme="dark"]) .lp-step,
+html[data-theme="light"] .lp-step,
+html:not([data-theme="dark"]) .lp-partner-mockup-card,
+html[data-theme="light"] .lp-partner-mockup-card,
+html:not([data-theme="dark"]) .lp-adv-metric,
+html[data-theme="light"] .lp-adv-metric,
+html:not([data-theme="dark"]) .lp-adv-chart,
+html[data-theme="light"] .lp-adv-chart,
+html:not([data-theme="dark"]) .lp-testimonial-card,
+html[data-theme="light"] .lp-testimonial-card,
+html:not([data-theme="dark"]) .lp-pricing-card,
+html[data-theme="light"] .lp-pricing-card,
+html:not([data-theme="dark"]) .lp-faq-item,
+html[data-theme="light"] .lp-faq-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+html:not([data-theme="dark"]) .lp-bento-card:hover,
+html[data-theme="light"] .lp-bento-card:hover,
+html:not([data-theme="dark"]) .lp-step:hover,
+html[data-theme="light"] .lp-step:hover,
+html:not([data-theme="dark"]) .lp-adv-metric:hover,
+html[data-theme="light"] .lp-adv-metric:hover,
+html:not([data-theme="dark"]) .lp-testimonial-card:hover,
+html[data-theme="light"] .lp-testimonial-card:hover,
+html:not([data-theme="dark"]) .lp-pricing-card:hover,
+html[data-theme="light"] .lp-pricing-card:hover,
+html:not([data-theme="dark"]) .lp-faq-item:hover,
+html[data-theme="light"] .lp-faq-item:hover {
+  border-color: rgba(124, 58, 237, 0.35);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+html:not([data-theme="dark"]) .lp-pricing-card-featured,
+html[data-theme="light"] .lp-pricing-card-featured {
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.05) 0%, #ffffff 100%);
+  border: 2px solid rgba(124, 58, 237, 0.45);
+  box-shadow: 0 20px 45px rgba(124, 58, 237, 0.12);
+}
+
+html:not([data-theme="dark"]) .lp-faq-open,
+html[data-theme="light"] .lp-faq-open {
+  border-color: rgba(124, 58, 237, 0.38);
+  background: #ffffff;
+}
+
+html:not([data-theme="dark"]) .lp-bento-card h3,
+html[data-theme="light"] .lp-bento-card h3,
+html:not([data-theme="dark"]) .lp-step h3,
+html[data-theme="light"] .lp-step h3,
+html:not([data-theme="dark"]) .lp-benefit-item strong,
+html[data-theme="light"] .lp-benefit-item strong,
+html:not([data-theme="dark"]) .lp-partner-stat-val,
+html[data-theme="light"] .lp-partner-stat-val,
+html:not([data-theme="dark"]) .lp-adv-metric-val,
+html[data-theme="light"] .lp-adv-metric-val,
+html:not([data-theme="dark"]) .lp-testimonial-author strong,
+html[data-theme="light"] .lp-testimonial-author strong,
+html:not([data-theme="dark"]) .lp-pricing-name,
+html[data-theme="light"] .lp-pricing-name,
+html:not([data-theme="dark"]) .lp-pricing-amount,
+html[data-theme="light"] .lp-pricing-amount,
+html:not([data-theme="dark"]) .lp-faq-question,
+html[data-theme="light"] .lp-faq-question {
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .lp-bento-card > p,
+html[data-theme="light"] .lp-bento-card > p,
+html:not([data-theme="dark"]) .lp-bento-features-list span,
+html[data-theme="light"] .lp-bento-features-list span,
+html:not([data-theme="dark"]) .lp-step p,
+html[data-theme="light"] .lp-step p,
+html:not([data-theme="dark"]) .lp-benefit-item p,
+html[data-theme="light"] .lp-benefit-item p,
+html:not([data-theme="dark"]) .lp-testimonial-card > p,
+html[data-theme="light"] .lp-testimonial-card > p,
+html:not([data-theme="dark"]) .lp-pricing-features li,
+html[data-theme="light"] .lp-pricing-features li,
+html:not([data-theme="dark"]) .lp-faq-answer p,
+html[data-theme="light"] .lp-faq-answer p {
+  color: #475569;
+}
+
+html:not([data-theme="dark"]) .lp-partner-stat-lbl,
+html[data-theme="light"] .lp-partner-stat-lbl,
+html:not([data-theme="dark"]) .lp-adv-metric-lbl,
+html[data-theme="light"] .lp-adv-metric-lbl,
+html:not([data-theme="dark"]) .lp-adv-chart-title,
+html[data-theme="light"] .lp-adv-chart-title,
+html:not([data-theme="dark"]) .lp-adv-bar span,
+html[data-theme="light"] .lp-adv-bar span,
+html:not([data-theme="dark"]) .lp-testimonial-author span,
+html[data-theme="light"] .lp-testimonial-author span,
+html:not([data-theme="dark"]) .lp-pricing-desc,
+html[data-theme="light"] .lp-pricing-desc,
+html:not([data-theme="dark"]) .lp-pricing-currency,
+html[data-theme="light"] .lp-pricing-currency,
+html:not([data-theme="dark"]) .lp-pricing-period,
+html[data-theme="light"] .lp-pricing-period,
+html:not([data-theme="dark"]) .lp-cta-small,
+html[data-theme="light"] .lp-cta-small {
+  color: #64748b;
+}
+
+html:not([data-theme="dark"]) .lp-adv-bar-highlight span,
+html[data-theme="light"] .lp-adv-bar-highlight span {
+  color: #ffffff;
+}
+
+html:not([data-theme="dark"]) .lp-bento-tv-screen,
+html[data-theme="light"] .lp-bento-tv-screen,
+html:not([data-theme="dark"]) .lp-partner-stat,
+html[data-theme="light"] .lp-partner-stat {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+html:not([data-theme="dark"]) .lp-partner-mockup-header,
+html[data-theme="light"] .lp-partner-mockup-header {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.10), rgba(124, 58, 237, 0.03));
+  border-bottom: 1px solid rgba(124, 58, 237, 0.14);
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .lp-partner-mockup-cta,
+html[data-theme="light"] .lp-partner-mockup-cta {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.18);
+  color: #6d28d9;
+}
+
+html:not([data-theme="dark"]) .lp-step-icon,
+html[data-theme="light"] .lp-step-icon {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(124, 58, 237, 0.04));
+  border-color: rgba(124, 58, 237, 0.20);
+  color: #7c3aed;
+}
+
+html:not([data-theme="dark"]) .lp-step-number,
+html[data-theme="light"] .lp-step-number {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(124, 58, 237, 0.08));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+html:not([data-theme="dark"]) .lp-benefit-check,
+html[data-theme="light"] .lp-benefit-check,
+html:not([data-theme="dark"]) .lp-bento-features-list span svg,
+html[data-theme="light"] .lp-bento-features-list span svg,
+html:not([data-theme="dark"]) .lp-pricing-features li svg,
+html[data-theme="light"] .lp-pricing-features li svg,
+html:not([data-theme="dark"]) .lp-adv-metric svg,
+html[data-theme="light"] .lp-adv-metric svg,
+html:not([data-theme="dark"]) .lp-faq-chevron-open,
+html[data-theme="light"] .lp-faq-chevron-open {
+  color: #7c3aed;
+}
+
+/* Rodapé Claro */
+html:not([data-theme="dark"]) .lp-footer,
+html[data-theme="light"] .lp-footer {
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+}
+
+html:not([data-theme="dark"]) .lp-footer-links-group h4,
+html[data-theme="light"] .lp-footer-links-group h4 {
+  color: #0f172a;
+}
+
+html:not([data-theme="dark"]) .lp-footer-brand p,
+html[data-theme="light"] .lp-footer-brand p,
+html:not([data-theme="dark"]) .lp-footer-links-group button,
+html[data-theme="light"] .lp-footer-links-group button,
+html:not([data-theme="dark"]) .lp-footer-links-group a,
+html[data-theme="light"] .lp-footer-links-group a,
+html:not([data-theme="dark"]) .lp-footer-links-group span,
+html[data-theme="light"] .lp-footer-links-group span,
+html:not([data-theme="dark"]) .lp-footer-bottom,
+html[data-theme="light"] .lp-footer-bottom {
+  color: #64748b;
+}
+
+html:not([data-theme="dark"]) .lp-footer-links-group button:hover,
+html[data-theme="light"] .lp-footer-links-group button:hover,
+html:not([data-theme="dark"]) .lp-footer-links-group a:hover,
+html[data-theme="light"] .lp-footer-links-group a:hover {
+  color: #7c3aed;
+}
+
+html:not([data-theme="dark"]) .lp-footer-bottom,
+html[data-theme="light"] .lp-footer-bottom {
+  border-top: 1px solid #e2e8f0;
+}
+
+
 

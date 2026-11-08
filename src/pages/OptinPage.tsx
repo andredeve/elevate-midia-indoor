@@ -7,6 +7,7 @@ import {
   DollarSign, WifiOff, LayoutDashboard
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useThemeStore } from '../stores/themeStore';
 import './OptinPage.css';
 
 interface LeadData {
@@ -19,6 +20,7 @@ interface LeadData {
 
 export default function OptinPage() {
   const navigate = useNavigate();
+  const { theme } = useThemeStore();
   const [lead, setLead] = useState<LeadData>({
     name: '',
     email: '',
@@ -101,7 +103,11 @@ export default function OptinPage() {
       {/* ── NAVBAR ── */}
       <nav className="opt-nav">
         <div className="opt-nav-logo" onClick={() => navigate('/')}>
-          <img src="/logo.png" alt="Elevate Mídia Indoor" className="opt-nav-logo-img" />
+          <img
+            src={theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+            alt="Elevate Mídia Indoor"
+            className="opt-nav-logo-img"
+          />
           <span className="opt-nav-tag">
             <Sparkles size={14} /> PROGRAMA VIP 2026
           </span>

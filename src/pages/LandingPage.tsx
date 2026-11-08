@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useThemeStore } from '../stores/themeStore';
 import {
   MonitorPlay, Tv, BarChart3, Users, Zap, Shield,
   ChevronDown, ChevronRight, Play, Star, ArrowRight,
   CheckCircle, Clock, Globe, Smartphone, Target,
   TrendingUp, Award, Eye, Sparkles, Building2,
-  MapPin, Phone, Mail, Menu, X as XIcon
+  MapPin, Phone, Mail, Menu, X as XIcon, Sun, Moon
 } from 'lucide-react';
 
 // ────────────────────────────────────────────────
@@ -76,6 +77,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 // ════════════════════════════════════════════════
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useThemeStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -109,11 +111,15 @@ export default function LandingPage() {
       <nav className={`lp-nav ${scrolled ? 'lp-nav-scrolled' : ''}`}>
         <div className="lp-nav-inner">
           <div className="lp-nav-brand" onClick={() => scrollToSection('hero')}>
-            <img src="/logo.png" alt="Elevate Mídia Indoor" style={{ height: '48px', width: 'auto' }} />
+            <img
+              src={theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+              alt="Elevate Mídia Indoor"
+              style={{ height: '48px', width: 'auto' }}
+            />
           </div>
 
           <div className="lp-nav-links">
-            <button onClick={() => navigate('/teste-gratis')} style={{ color: '#c084fc', fontWeight: 700 }}>⚡ 3 Meses Grátis</button>
+            <button onClick={() => navigate('/teste-gratis')} className="lp-nav-promo-btn">⚡ 3 Meses Grátis</button>
             <button onClick={() => scrollToSection('features')}>Recursos</button>
             <button onClick={() => scrollToSection('how-it-works')}>Como Funciona</button>
             <button onClick={() => scrollToSection('for-partners')}>Parceiros</button>
@@ -123,6 +129,19 @@ export default function LandingPage() {
           </div>
 
           <div className="lp-nav-actions">
+            <button
+              type="button"
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+              aria-label={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+            >
+              {theme === 'dark' ? (
+                <Sun size={15} strokeWidth={2} />
+              ) : (
+                <Moon size={15} strokeWidth={2} />
+              )}
+            </button>
             <button className="lp-btn-ghost" onClick={() => navigate('/login')}>Entrar</button>
             <button className="lp-btn-primary-sm" onClick={() => navigate('/teste-gratis')}>
               3 Meses Grátis <ArrowRight size={16} />
@@ -136,7 +155,7 @@ export default function LandingPage() {
 
         {/* Mobile menu */}
         <div className={`lp-mobile-menu ${mobileMenuOpen ? 'lp-mobile-menu-open' : ''}`}>
-          <button onClick={() => navigate('/teste-gratis')} style={{ color: '#c084fc', fontWeight: 700 }}>⚡ 3 Meses Grátis</button>
+          <button onClick={() => navigate('/teste-gratis')} className="lp-nav-promo-btn">⚡ 3 Meses Grátis</button>
           <button onClick={() => scrollToSection('features')}>Recursos</button>
           <button onClick={() => scrollToSection('how-it-works')}>Como Funciona</button>
           <button onClick={() => scrollToSection('for-partners')}>Parceiros</button>
@@ -758,7 +777,11 @@ export default function LandingPage() {
         <div className="lp-footer-inner">
           <div className="lp-footer-brand">
             <div className="lp-nav-brand">
-              <img src="/logo.png" alt="Elevate Mídia Indoor" style={{ height: '52px', width: 'auto' }} />
+              <img
+                src={theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+                alt="Elevate Mídia Indoor"
+                style={{ height: '52px', width: 'auto' }}
+              />
             </div>
             <p>A plataforma completa de gestão e monetização de telas de mídia indoor no Brasil.</p>
           </div>

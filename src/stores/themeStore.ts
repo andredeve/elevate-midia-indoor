@@ -8,10 +8,10 @@ interface ThemeState {
   toggleTheme: () => void;
 }
 
-const STORAGE_KEY = '@elevate_theme';
+const STORAGE_KEY = '@elevate_theme_v2';
 
 const getInitialTheme = (): Theme => {
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined') return 'light';
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') {
@@ -20,7 +20,7 @@ const getInitialTheme = (): Theme => {
   } catch {
     /* ignore localStorage errors */
   }
-  return 'dark';
+  return 'light';
 };
 
 const applyThemeToDOM = (theme: Theme) => {
