@@ -914,7 +914,7 @@ Retorne APENAS um JSON válido puro, sem marcação markdown ou código extra, n
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
               gap: 20
             }}
           >

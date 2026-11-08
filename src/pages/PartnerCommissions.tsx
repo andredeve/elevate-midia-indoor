@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useMemo, type FormEvent } from 'react';
+import { useEffect, useState, useMemo, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
 import {
@@ -473,6 +473,7 @@ export default function PartnerCommissions() {
               <div className="empty-state-desc">Nenhuma comissão corresponde ao filtro atual.</div>
             </div>
           ) : (
+            <div className="table-scroll">
             <table className="data-table">
               <thead>
                 <tr>
@@ -546,6 +547,7 @@ export default function PartnerCommissions() {
                 })}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       )}
@@ -564,6 +566,7 @@ export default function PartnerCommissions() {
               </div>
             </div>
           ) : (
+            <div className="table-scroll">
             <table className="data-table">
               <thead>
                 <tr>
@@ -639,6 +642,7 @@ export default function PartnerCommissions() {
                 })}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       )}

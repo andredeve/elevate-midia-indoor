@@ -1,4 +1,4 @@
-﻿/* ════════════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    Elevate Mídia Indoor — Brand Purple & Electric Indigo (#d932fc -> #8a08ff -> #3b01fd) Dark Theme
    ════════════════════════════════════════════════════════════════ */
 
@@ -1563,7 +1563,66 @@
   .lp-footer-inner { grid-template-columns: 1fr 1fr; }
 }
 
-@media (max-width: 480px) {
-  .lp-footer-inner { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .lp-nav {
+    padding: 0.75rem 1rem;
+  }
+
+  .lp-nav-actions .lp-btn-ghost {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .lp-nav-actions .lp-btn-primary {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.78rem;
+  }
+
+  .lp-hero {
+    padding: 6.5rem 1.25rem 3.5rem;
+    min-height: auto;
+  }
+
+  .lp-hero-ctas,
+  .lp-cta-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lp-hero-ctas .lp-btn,
+  .lp-cta-actions .lp-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .lp-section {
+    padding: 3.75rem 1.25rem;
+  }
+
+  .lp-section-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .lp-cta-section {
+    padding: 4rem 1.25rem;
+  }
+
+  .lp-proof-bar {
+    padding: 2rem 1.25rem;
+  }
+
+  .lp-proof-number {
+    font-size: 1.85rem;
+  }
+
+  .lp-bento-card {
+    padding: 1.4rem;
+  }
 }
+
+@media (max-width: 480px) {
+  .lp-footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .lp-footer { padding: 3rem 1.25rem 1.5rem; }
+}
+
 

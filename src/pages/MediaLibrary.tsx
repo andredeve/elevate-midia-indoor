@@ -320,7 +320,7 @@ export default function MediaLibrary() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(245px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))',
             gap: 14
           }}
         >

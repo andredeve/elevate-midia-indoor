@@ -1272,15 +1272,12 @@ export default function PartnerManagement() {
                         return (
                           <div
                             key={day.id}
+                            className="schedule-day-row"
                             style={{
                               background: day.isOpen ? 'var(--bg-surface)' : 'var(--bg-base)',
                               border: `1px solid ${day.isOpen ? 'var(--border-default)' : 'var(--border-subtle)'}`,
                               borderRadius: 'var(--r-md)',
                               padding: '10px 12px',
-                              display: 'grid',
-                              gridTemplateColumns: '155px 1fr auto',
-                              alignItems: 'center',
-                              gap: '14px',
                               opacity: day.isOpen ? 1 : 0.65
                             }}
                           >
@@ -2134,7 +2131,8 @@ export default function PartnerManagement() {
                       border: '1px solid var(--border-subtle)',
                       borderRadius: 'var(--radius-md)',
                       maxHeight: '440px',
-                      overflowY: 'auto'
+                      overflowY: 'auto',
+                      overflowX: 'auto'
                     }}
                   >
                     <table className="table" style={{ margin: 0 }}>

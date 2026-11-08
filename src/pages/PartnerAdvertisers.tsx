@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
 import {
@@ -312,6 +312,7 @@ export default function PartnerAdvertisers() {
             <div className="empty-state-desc">Nenhum anunciante corresponde à busca &quot;{searchQuery}&quot;.</div>
           </div>
         ) : (
+          <div className="table-scroll">
           <table className="data-table">
             <thead>
               <tr>
@@ -391,6 +392,7 @@ export default function PartnerAdvertisers() {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 

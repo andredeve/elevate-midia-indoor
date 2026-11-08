@@ -580,7 +580,7 @@ export default function PartnerMedia() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
                     <select
                       className="select-field"
-                      style={{ width: 'auto', minWidth: '220px', height: '30px', fontSize: '12.5px' }}
+                      style={{ width: 'auto', minWidth: 'min(100%, 220px)', maxWidth: '100%', height: '30px', fontSize: '12.5px' }}
                       value={selectedTerminalId}
                       onChange={e => handleTerminalChange(e.target.value)}
                     >
@@ -717,7 +717,7 @@ export default function PartnerMedia() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 270px), 1fr))',
             gap: '14px'
           }}
         >
