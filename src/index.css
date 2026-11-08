@@ -60,6 +60,15 @@ html[data-theme="dark"] {
   --border-default:  rgba(255, 255, 255, 0.10);
   --border-strong:   rgba(255, 255, 255, 0.17);
 
+  /* Input & Control Surfaces (Dark Mode) */
+  --bg-input:        #0e0e16;
+  --bg-input-hover:  #12121c;
+  --bg-input-focus:  #141420;
+  --border-input:    rgba(255, 255, 255, 0.13);
+  --border-input-hover: rgba(255, 255, 255, 0.22);
+  --ring-input:      rgba(168, 85, 247, 0.22);
+  --shadow-input:    0 1px 2px rgba(0, 0, 0, 0.35);
+
   /* Architectural Geometry */
   --r-xs:   4px;
   --r-sm:   6px;
@@ -153,6 +162,15 @@ html[data-theme="light"] {
   --border-subtle:   rgba(15, 23, 42, 0.08);
   --border-default:  rgba(15, 23, 42, 0.14);
   --border-strong:   rgba(15, 23, 42, 0.24);
+
+  /* Input & Control Surfaces (Light Mode) */
+  --bg-input:        #ffffff;
+  --bg-input-hover:  #ffffff;
+  --bg-input-focus:  #ffffff;
+  --border-input:    #cbd5e1;
+  --border-input-hover: #94a3b8;
+  --ring-input:      rgba(124, 58, 237, 0.16);
+  --shadow-input:    0 1px 2px rgba(15, 23, 42, 0.05);
 
   /* Light Elevation */
   --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
@@ -788,15 +806,19 @@ button, input, select, textarea { font-family: inherit; }
 
 .search-field input {
   width: 100%;
-  height: 34px;
+  height: 36px;
   padding: 0 32px 0 34px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
   border-radius: var(--r-md);
   color: var(--text-primary);
   font-size: 13px;
+  box-shadow: var(--shadow-input);
   outline: none;
-  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+  transition:
+    border-color var(--dur-fast) ease,
+    background var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
 }
 
 .search-field input::placeholder {
@@ -804,12 +826,14 @@ button, input, select, textarea { font-family: inherit; }
 }
 
 .search-field input:hover {
-  border-color: var(--border-strong);
+  background: var(--bg-input-hover);
+  border-color: var(--border-input-hover);
 }
 
 .search-field input:focus {
-  border-color: var(--border-strong);
-  background: var(--bg-surface-sub);
+  background: var(--bg-input-focus);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring-input), var(--shadow-input);
 }
 
 .search-field-clear {
@@ -1281,39 +1305,99 @@ button, input, select, textarea { font-family: inherit; }
 }
 
 .input-field,
-.select-field {
+.select-field,
+.form-input,
+.form-select,
+.app-container input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+.auth-container input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+.modal-overlay input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+.app-container textarea,
+.modal-overlay textarea {
   width: 100%;
-  height: 36px;
+  height: 38px;
   padding: 0 12px;
-  background: var(--bg-base);
-  border: 1px solid var(--border-default);
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-input);
   border-radius: var(--r-md);
   color: var(--text-primary);
+  caret-color: var(--accent);
   font-size: 13px;
-  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+  box-shadow: var(--shadow-input);
+  transition:
+    border-color var(--dur-fast) ease,
+    background-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
   outline: none;
 }
 
-textarea.input-field {
+.search-field input {
+  padding-left: 34px !important;
+  padding-right: 32px !important;
+}
+
+textarea.input-field,
+.app-container textarea,
+.modal-overlay textarea {
   height: auto;
   padding: 10px 12px;
   line-height: 1.5;
   resize: vertical;
 }
 
-.input-field::placeholder {
+.input-field::placeholder,
+.app-container input::placeholder,
+.auth-container input::placeholder,
+.modal-overlay input::placeholder,
+.app-container textarea::placeholder,
+.modal-overlay textarea::placeholder {
   color: var(--text-tertiary);
+  opacity: 1;
 }
 
 .input-field:hover,
-.select-field:hover {
-  border-color: var(--border-strong);
+.select-field:hover,
+.app-container input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover,
+.auth-container input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover,
+.modal-overlay input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover,
+.app-container textarea:hover,
+.modal-overlay textarea:hover {
+  background-color: var(--bg-input-hover);
+  border-color: var(--border-input-hover);
 }
 
 .input-field:focus,
-.select-field:focus {
-  border-color: var(--text-secondary);
-  background: #0d0d10;
+.select-field:focus,
+.app-container input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+.auth-container input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+.modal-overlay input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+.app-container textarea:focus,
+.modal-overlay textarea:focus {
+  border-color: var(--accent);
+  background-color: var(--bg-input-focus);
+  box-shadow: 0 0 0 3px var(--ring-input), var(--shadow-input);
+}
+
+/* Fix browser autofill dark/yellow background in both Light and Dark themes */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-primary) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--bg-input) inset !important;
+  box-shadow: 0 0 0px 1000px var(--bg-input) inset !important;
+  caret-color: var(--accent) !important;
+  border-color: var(--border-input);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px var(--bg-input-focus) inset, 0 0 0 3px var(--ring-input) !important;
+  box-shadow: 0 0 0px 1000px var(--bg-input-focus) inset, 0 0 0 3px var(--ring-input) !important;
+  border-color: var(--accent);
 }
 
 select.input-field,
