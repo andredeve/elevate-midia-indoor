@@ -1000,7 +1000,7 @@ button, input, select, textarea { font-family: inherit; }
   font-size: 12px;
   font-weight: 500;
   color: var(--text-tertiary);
-  background: rgba(255, 255, 255, 0.015);
+  background: var(--bg-surface-sub);
   border-bottom: 1px solid var(--border-subtle);
   white-space: nowrap;
 }
