@@ -494,9 +494,10 @@ export default function Terminals() {
         </div>
       ) : (
         <div
+          className="fixed-card-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 410px))',
             gap: 14
           }}
         >

@@ -1956,11 +1956,26 @@ select.input-field option,
     justify-content: center;
   }
 
-  /* Partner tables/grids on mobile & tablet: fixed width, zero scrolling */
+  /* Partner tables/grids & all data-tables on mobile: fixed width, zero scrolling */
+  .partner-media-grid,
+  .fixed-card-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 100% !important;
+  }
+  .table-scroll,
+  .table-container {
+    overflow-x: hidden;
+  }
+  .data-table thead,
+  .table thead,
   .partner-table thead,
   .partner-grade-table thead {
     display: none;
   }
+  .data-table,
+  .data-table tbody,
+  .table,
+  .table tbody,
   .partner-table,
   .partner-table tbody,
   .partner-grade-table,
@@ -1968,6 +1983,8 @@ select.input-field option,
     display: block;
     width: 100%;
   }
+  .data-table tbody tr,
+  .table tbody tr,
   .partner-table tbody tr,
   .partner-grade-table tbody tr {
     display: flex;
@@ -1980,6 +1997,8 @@ select.input-field option,
     width: 100%;
     max-width: 100%;
   }
+  .data-table tbody tr td,
+  .table tbody tr td,
   .partner-table tbody tr td,
   .partner-grade-table tbody tr td {
     padding: 0;
@@ -1987,6 +2006,8 @@ select.input-field option,
     width: auto;
     max-width: 100%;
   }
+  .data-table tbody tr td:first-child,
+  .data-table tbody tr td:last-child,
   .partner-table tbody tr td:first-child,
   .partner-table tbody tr td:last-child,
   .partner-grade-table tbody tr td:nth-child(3),
@@ -1994,6 +2015,7 @@ select.input-field option,
     width: 100%;
     flex: 1 1 100%;
   }
+  .data-table tbody tr td:last-child > div,
   .partner-table tbody tr td:last-child > div {
     justify-content: flex-start !important;
     width: 100%;

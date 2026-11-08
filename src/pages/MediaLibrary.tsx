@@ -318,9 +318,10 @@ export default function MediaLibrary() {
         </div>
       ) : (
         <div
+          className="fixed-card-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 300px))',
             gap: 14
           }}
         >
