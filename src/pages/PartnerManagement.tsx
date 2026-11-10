@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../lib/supabase';
 import { parsePartnerContactAndQuota, formatPartnerContactWithQuota } from '../utils/partnerQuota';
 import { isTerminalOnline } from '../utils/terminalStatus';
+import { isChunkedStreamUrl } from '../utils/largeMediaUpload';
 import {
   Users,
   Copy,
@@ -404,7 +405,7 @@ export default function PartnerManagement() {
       const resolvedMediaList = await Promise.all(
         (mediaFiles || []).map(async (m: any) => {
           let playUrl = m.url;
-          if (m.file_path) {
+          if (m.file_path && !isChunkedStreamUrl(m.url)) {
             try {
               const { data: signed } = await supabase.storage
                 .from('media')
@@ -421,7 +422,7 @@ export default function PartnerManagement() {
       const resolvedPlaylistItems = await Promise.all(
         activeItems.map(async (pi: any) => {
           let playUrl = pi.media?.url;
-          if (pi.media?.file_path) {
+          if (pi.media?.file_path && !isChunkedStreamUrl(pi.media?.url)) {
             try {
               const { data: signed } = await supabase.storage
                 .from('media')

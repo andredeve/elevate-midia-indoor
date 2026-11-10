@@ -16,6 +16,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AIVideoGeneratorModal from '../components/AIVideoGeneratorModal';
+import { uploadLargeMediaToSupabase, removeLargeMediaFromSupabase } from '../utils/largeMediaUpload';
 
 interface MediaFile {
   id: string;
@@ -24,6 +25,7 @@ interface MediaFile {
   file_type: string;
   file_size: number;
   created_at: string;
+  url?: string;
   publicUrl?: string;
 }
 
@@ -33,6 +35,7 @@ export default function MediaLibrary() {
   const [advertisers, setAdvertisers] = useState<{ id: string; company_name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadLabel, setUploadLabel] = useState<string>('');
   const [isAIVideoModalOpen, setIsAIVideoModalOpen] = useState(false);
   const [previewItem, setPreviewItem] = useState<MediaFile | null>(null);
 
@@ -152,18 +155,34 @@ export default function MediaLibrary() {
     }
 
     setUploading(true);
+    setUploadLabel('Iniciando envio...');
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
     const filePath = `${user?.id}/${fileName}`;
 
+    let validFileType = file.type || 'video/mp4';
+    if (!['video/mp4', 'image/jpeg', 'image/png', 'image/webp'].includes(validFileType)) {
+      if (file.name.toLowerCase().match(/\.(mp4|mov|m4v|mkv)$/) || validFileType.startsWith('video/')) {
+        validFileType = 'video/mp4';
+      } else if (validFileType.startsWith('image/png') || file.name.toLowerCase().endsWith('.png')) {
+        validFileType = 'image/png';
+      } else if (validFileType.startsWith('image/webp') || file.name.toLowerCase().endsWith('.webp')) {
+        validFileType = 'image/webp';
+      } else {
+        validFileType = 'image/jpeg';
+      }
+    }
+
     try {
-      const { error: uploadError } = await supabase.storage
-        .from('media')
-        .upload(filePath, file);
-      if (uploadError) throw uploadError;
+      const uploadRes = await uploadLargeMediaToSupabase(file, filePath, {
+        contentType: validFileType,
+        onProgress: (_pct, label) => {
+          if (label) setUploadLabel(label);
+        }
+      });
 
       const simpleChecksum = btoa(
-        `${file.name}-${file.size}-${file.lastModified}`
+        unescape(encodeURIComponent(`${file.name}-${file.size}-${file.lastModified}`))
       ).substring(0, 32);
       const { data: userData } = await supabase
         .from('users')
@@ -175,18 +194,20 @@ export default function MediaLibrary() {
         org_id: userData?.org_id,
         name: file.name,
         file_path: filePath,
-        file_type: file.type,
+        url: uploadRes.isChunked ? uploadRes.url : null,
+        file_type: validFileType,
         file_size: file.size,
         checksum: simpleChecksum
       });
 
       if (dbError) throw dbError;
       await loadMedia();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro no upload:', error);
-      alert('Erro ao enviar o arquivo.');
+      alert('Erro ao enviar o arquivo: ' + (error?.message || 'Erro desconhecido'));
     } finally {
       setUploading(false);
+      setUploadLabel('');
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -194,7 +215,8 @@ export default function MediaLibrary() {
   const deleteMedia = async (id: string, filePath: string) => {
     if (!window.confirm('Tem certeza que deseja excluir esta mídia permanentemente?'))
       return;
-    await supabase.storage.from('media').remove([filePath]);
+    const item = media.find((m) => m.id === id);
+    await removeLargeMediaFromSupabase(filePath, item?.url || item?.publicUrl);
     await supabase.from('media_files').delete().eq('id', id);
     setMedia(media.filter((m) => m.id !== id));
   };
@@ -212,7 +234,7 @@ export default function MediaLibrary() {
 
         <input
           type="file"
-          accept="video/mp4,image/jpeg,image/png,image/webp"
+          accept="video/mp4,video/quicktime,video/*,image/jpeg,image/png,image/webp"
           ref={fileInputRef}
           style={{ display: 'none' }}
           onChange={handleFileUpload}
@@ -235,7 +257,7 @@ export default function MediaLibrary() {
             disabled={uploading}
           >
             {uploading ? <div className="loader" /> : <Upload size={15} strokeWidth={2} />}
-            <span>{uploading ? 'Enviando...' : 'Enviar Mídia'}</span>
+            <span>{uploading ? (uploadLabel || 'Enviando...') : 'Enviar Mídia'}</span>
           </button>
         </div>
       </div>
@@ -244,7 +266,7 @@ export default function MediaLibrary() {
       <div className="notice-bar">
         <Info size={15} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
         <span>
-          Formatos recomendados: <strong style={{ color: 'var(--text-primary)', fontWeight: 500 }}>MP4 (H.264)</strong> para vídeos e{' '}
+          Formatos suportados: <strong style={{ color: 'var(--text-primary)', fontWeight: 500 }}>MP4 / MOV (H.264 — inclusive vídeos grandes acima de 500 MB)</strong> e{' '}
           <strong style={{ color: 'var(--text-primary)', fontWeight: 500 }}>JPG / PNG / WebP</strong> para imagens estáticas.
         </span>
       </div>

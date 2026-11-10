@@ -1,6 +1,10 @@
-﻿import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
+import {
+  uploadLargeMediaToSupabase,
+  removeLargeMediaFromSupabase
+} from '../utils/largeMediaUpload';
 import {
   BarChart3,
   Eye,
@@ -39,6 +43,7 @@ interface MediaItem {
   created_at: string;
   status?: string;
   file_path?: string;
+  url?: string;
 }
 
 export default function AdvertiserDashboard() {
@@ -57,6 +62,7 @@ export default function AdvertiserDashboard() {
   const [uploadName, setUploadName] = useState('');
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadLabel, setUploadLabel] = useState('');
 
   const handleUploadMedia = async (e: FormEvent) => {
     e.preventDefault();
@@ -68,25 +74,48 @@ export default function AdvertiserDashboard() {
     }
 
     setUploading(true);
+    setUploadLabel('Preparando envio...');
     try {
       const fileExt = uploadFile.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = `advertisers/${advertiser.id}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage.from('media').upload(filePath, uploadFile);
-      if (uploadError) throw uploadError;
+      let validFileType = uploadFile.type || 'video/mp4';
+      if (!['video/mp4', 'image/jpeg', 'image/png', 'image/webp'].includes(validFileType)) {
+        if (uploadFile.name.toLowerCase().endsWith('.mp4') || validFileType.startsWith('video/')) {
+          validFileType = 'video/mp4';
+        } else if (validFileType.startsWith('image/png') || uploadFile.name.toLowerCase().endsWith('.png')) {
+          validFileType = 'image/png';
+        } else if (validFileType.startsWith('image/webp') || uploadFile.name.toLowerCase().endsWith('.webp')) {
+          validFileType = 'image/webp';
+        } else {
+          validFileType = 'image/jpeg';
+        }
+      }
+
+      const uploadRes = await uploadLargeMediaToSupabase(uploadFile, filePath, {
+        contentType: validFileType,
+        onProgress: (_pct, label) => {
+          if (label) setUploadLabel(label);
+        }
+      });
 
       const { data: userData } = await supabase.from('users').select('org_id').eq('id', user?.id).single();
 
-      const { error: dbError } = await supabase.from('media_files').insert({
+      const insertPayload: Record<string, any> = {
         org_id: userData?.org_id,
         name: uploadName || uploadFile.name,
         file_path: filePath,
-        file_type: uploadFile.type,
+        file_type: validFileType,
         file_size: uploadFile.size,
         advertiser_id: advertiser.id,
         status: 'pending'
-      });
+      };
+      if (uploadRes.isChunked && uploadRes.url) {
+        insertPayload.url = uploadRes.url;
+      }
+
+      const { error: dbError } = await supabase.from('media_files').insert(insertPayload);
 
       if (dbError) throw dbError;
 
@@ -95,19 +124,20 @@ export default function AdvertiserDashboard() {
       setUploadFile(null);
       await loadDashboard();
       alert('Mídia enviada com sucesso. Ela entrará na programação após revisão da administração.');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao enviar mídia:', error);
-      alert('Erro ao submeter a mídia.');
+      alert(`Erro ao submeter a mídia: ${error?.message || 'Erro desconhecido'}`);
     } finally {
       setUploading(false);
+      setUploadLabel('');
     }
   };
 
-  const handleDeleteMedia = async (id: string, filePath?: string) => {
+  const handleDeleteMedia = async (id: string, filePath?: string, mediaUrl?: string) => {
     if (!window.confirm('Tem certeza que deseja excluir esta mídia?')) return;
     try {
       if (filePath) {
-        await supabase.storage.from('media').remove([filePath]);
+        await removeLargeMediaFromSupabase(filePath, mediaUrl);
       }
       await supabase.from('media_files').delete().eq('id', id);
       setMediaList(prev => prev.filter(m => m.id !== id));
@@ -543,7 +573,7 @@ export default function AdvertiserDashboard() {
                       <td style={{ textAlign: 'right' }}>
                         <button
                           type="button"
-                          onClick={() => handleDeleteMedia(media.id, media.file_path)}
+                          onClick={() => handleDeleteMedia(media.id, media.file_path, media.url)}
                           className="icon-btn danger"
                           title="Excluir mídia"
                         >
@@ -611,7 +641,7 @@ export default function AdvertiserDashboard() {
                     style={{ padding: '6px 10px', height: 'auto' }}
                   />
                   <span className="input-hint">
-                    Recomendado: resolução Full HD (1920x1080), formato MP4 (H.264) até 50 MB.
+                    Recomendado: resolução Full HD (1920x1080), formato MP4 (H.264) — suporta vídeos grandes acima de 500 MB.
                   </span>
                 </div>
               </div>
@@ -625,7 +655,14 @@ export default function AdvertiserDashboard() {
                   Cancelar
                 </button>
                 <button type="submit" disabled={uploading} className="btn btn-primary">
-                  {uploading ? <div className="loader" /> : 'Enviar para Revisão'}
+                  {uploading ? (
+                    <>
+                      <div className="loader" />
+                      <span>{uploadLabel || 'Enviando...'}</span>
+                    </>
+                  ) : (
+                    'Enviar para Revisão'
+                  )}
                 </button>
               </div>
             </form>

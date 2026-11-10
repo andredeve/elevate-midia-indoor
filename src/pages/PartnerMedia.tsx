@@ -4,6 +4,11 @@ import { useAuthStore } from '../stores/authStore';
 import { parsePartnerContactAndQuota } from '../utils/partnerQuota';
 import { isTerminalOnline } from '../utils/terminalStatus';
 import {
+  uploadLargeMediaToSupabase,
+  removeLargeMediaFromSupabase,
+  isChunkedStreamUrl
+} from '../utils/largeMediaUpload';
+import {
   Upload,
   FileVideo,
   CheckCircle2,
@@ -78,6 +83,7 @@ export default function PartnerMedia() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadLabel, setUploadLabel] = useState<string>('');
 
   // RLS Help Box State
   const [showRlsHelp, setShowRlsHelp] = useState(false);
@@ -91,7 +97,7 @@ export default function PartnerMedia() {
 
   const handleOpenPreview = async (file: MediaFile) => {
     let playUrl = file.publicUrl || file.url;
-    if (file.file_path) {
+    if (file.file_path && !isChunkedStreamUrl(playUrl)) {
       try {
         const { data: signed } = await supabase.storage
           .from('media')
@@ -221,7 +227,7 @@ export default function PartnerMedia() {
       const mediaWithUrls = await Promise.all(
         (mediaData || []).map(async (file: any) => {
           let playUrl = file.url;
-          if (file.file_path) {
+          if (file.file_path && !isChunkedStreamUrl(file.url)) {
             try {
               const { data: signedData } = await supabase.storage
                 .from('media')
@@ -268,29 +274,12 @@ export default function PartnerMedia() {
 
     try {
       setUploading(true);
-      setUploadProgress(15);
+      setUploadProgress(1);
+      setUploadLabel('Preparando envio...');
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('media')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        if (uploadError.message?.includes('row-level security') || uploadError.message?.includes('policy')) {
-          setShowRlsHelp(true);
-        }
-        throw uploadError;
-      }
-      setUploadProgress(75);
-
-      const { data: userData } = await supabase.from('users').select('org_id').eq('id', user.id).single();
-      const targetOrgId = userData?.org_id || partnerOrgId;
 
       let validFileType = file.type || 'video/mp4';
       if (!['video/mp4', 'image/jpeg', 'image/png', 'image/webp'].includes(validFileType)) {
@@ -305,9 +294,22 @@ export default function PartnerMedia() {
         }
       }
 
-      const simpleChecksum = btoa(`${file.name}-${file.size}-${file.lastModified}`).substring(0, 32);
+      const uploadRes = await uploadLargeMediaToSupabase(file, filePath, {
+        contentType: validFileType,
+        onProgress: (pct, label) => {
+          setUploadProgress(pct);
+          if (label) setUploadLabel(label);
+        }
+      });
 
-      const newMedia = {
+      const { data: userData } = await supabase.from('users').select('org_id').eq('id', user.id).single();
+      const targetOrgId = userData?.org_id || partnerOrgId;
+
+      const simpleChecksum = btoa(
+        unescape(encodeURIComponent(`${file.name}-${file.size}-${file.lastModified}`))
+      ).substring(0, 32);
+
+      const newMedia: Record<string, any> = {
         org_id: targetOrgId,
         name: file.name,
         file_path: filePath,
@@ -317,6 +319,9 @@ export default function PartnerMedia() {
         partner_id: partnerId,
         status: 'approved'
       };
+      if (uploadRes.isChunked && uploadRes.url) {
+        newMedia.url = uploadRes.url;
+      }
 
       const { error: dbError } = await supabase
         .from('media_files')
@@ -348,6 +353,7 @@ export default function PartnerMedia() {
     } finally {
       setUploading(false);
       setUploadProgress(0);
+      setUploadLabel('');
       if (event.target) event.target.value = '';
     }
   };
@@ -442,7 +448,7 @@ export default function PartnerMedia() {
 
       if (file.file_path) {
         try {
-          await supabase.storage.from('media').remove([file.file_path]);
+          await removeLargeMediaFromSupabase(file.file_path, file.url || file.publicUrl);
         } catch (storageErr) {
           console.warn('Aviso ao remover arquivo do storage:', storageErr);
         }
@@ -603,7 +609,7 @@ export default function PartnerMedia() {
           <input
             type="file"
             id="partner-media-upload"
-            accept="image/*,video/mp4,video/webm"
+            accept="image/*,video/mp4,video/quicktime,video/*"
             style={{ display: 'none' }}
             onChange={handleFileUpload}
             disabled={uploading}
@@ -614,7 +620,7 @@ export default function PartnerMedia() {
             style={{ cursor: uploading ? 'wait' : 'pointer', opacity: uploading ? 0.65 : 1 }}
           >
             {uploading ? <div className="loader" /> : <Upload size={14} />}
-            <span>{uploading ? `Enviando (${uploadProgress}%)` : 'Enviar Mídia'}</span>
+            <span>{uploading ? (uploadLabel || `Enviando (${uploadProgress}%)`) : 'Enviar Mídia'}</span>
           </label>
         </div>
       </div>

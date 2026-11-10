@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useRef, type FormEvent, type ChangeEvent 
 import { createClient } from '@supabase/supabase-js';
 import { supabase, supabaseUrl, supabaseAnonKey } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
+import { uploadLargeMediaToSupabase } from '../utils/largeMediaUpload';
 import {
   Briefcase,
   Plus,
@@ -207,24 +208,43 @@ export default function AdvertiserManagement() {
     setUploadingAdvMedia(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = `advertisers/${selectedAdvForMedia.id}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage.from('media').upload(filePath, file);
-      if (uploadError) throw uploadError;
+      let validFileType = file.type || 'video/mp4';
+      if (!['video/mp4', 'image/jpeg', 'image/png', 'image/webp'].includes(validFileType)) {
+        if (file.name.toLowerCase().endsWith('.mp4') || validFileType.startsWith('video/')) {
+          validFileType = 'video/mp4';
+        } else if (validFileType.startsWith('image/png') || file.name.toLowerCase().endsWith('.png')) {
+          validFileType = 'image/png';
+        } else if (validFileType.startsWith('image/webp') || file.name.toLowerCase().endsWith('.webp')) {
+          validFileType = 'image/webp';
+        } else {
+          validFileType = 'image/jpeg';
+        }
+      }
+
+      const uploadRes = await uploadLargeMediaToSupabase(file, filePath, {
+        contentType: validFileType
+      });
 
       const { data: adminData } = await supabase.from('users').select('org_id').eq('id', user?.id).single();
 
-      const { error: dbError } = await supabase.from('media_files').insert({
+      const insertPayload: Record<string, any> = {
         org_id: adminData?.org_id || '00000000-0000-0000-0000-000000000001',
         name: file.name,
         original_name: file.name,
         file_path: filePath,
-        file_type: file.type,
+        file_type: validFileType,
         file_size: file.size,
         advertiser_id: selectedAdvForMedia.id,
         status: 'approved'
-      });
+      };
+      if (uploadRes.isChunked && uploadRes.url) {
+        insertPayload.url = uploadRes.url;
+      }
+
+      const { error: dbError } = await supabase.from('media_files').insert(insertPayload);
 
       if (dbError) throw dbError;
 
