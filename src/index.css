@@ -1925,6 +1925,117 @@ select.input-field option,
 }
 
 /* ================================================================
+   PARTNER MEDIA & AUTONOMY DESIGN SYSTEM
+   ================================================================ */
+.partner-quota-card {
+  border-color: var(--border-default);
+}
+.partner-quota-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.partner-quota-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 340px;
+  min-width: 0;
+}
+.partner-quota-details {
+  flex: 1;
+  min-width: 0;
+}
+.partner-quota-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.partner-terminal-select {
+  width: auto;
+  min-width: min(100%, 220px);
+  max-width: 100%;
+  height: 32px;
+  font-size: 12.5px;
+}
+.partner-quota-stat {
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+.partner-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 290px));
+  gap: 14px;
+  max-width: 920px;
+  width: 100%;
+}
+.partner-media-card {
+  width: 100%;
+}
+.partner-card-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.partner-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.preview-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+.preview-modal-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.duration-video-full-card {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.duration-video-full-title {
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+.duration-video-full-subtitle {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.duration-shortcuts-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ================================================================
    GRID & TYPOGRAPHY UTILITIES
    ================================================================ */
 .grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 14px; }
@@ -2066,6 +2177,15 @@ select.input-field option,
     gap: 12px;
     margin-bottom: 18px;
   }
+  .page-title-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .page-title-row .badge {
+    white-space: normal;
+    text-align: left;
+    max-width: 100%;
+  }
   .page-title {
     font-size: 18px;
   }
@@ -2080,12 +2200,65 @@ select.input-field option,
   }
   .page-actions > .btn,
   .page-actions > a.btn,
+  .page-actions > label.btn,
   .page-actions > .select-field,
-  .page-actions > .referral-box {
-    flex: 1 1 auto;
-    width: auto !important;
+  .page-actions > .referral-box,
+  .page-actions > * {
+    flex: 1 1 100%;
+    width: 100% !important;
     max-width: 100%;
     justify-content: center;
+    height: 40px;
+    font-size: 13px;
+  }
+
+  /* Partner Quota Card on Mobile */
+  .partner-quota-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .partner-quota-info {
+    align-items: flex-start;
+    width: 100%;
+  }
+  .partner-quota-details {
+    width: 100%;
+  }
+  .partner-quota-controls {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .partner-terminal-select {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 40px !important;
+    font-size: 13.5px !important;
+  }
+  .partner-quota-controls > .badge {
+    width: 100%;
+    justify-content: center;
+    height: 32px;
+    font-size: 12px;
+  }
+  .partner-reboot-btn {
+    width: 100%;
+    justify-content: center;
+    height: 38px;
+    font-size: 13px;
+  }
+  .partner-quota-stat {
+    text-align: left;
+    width: 100%;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .kpi-grid,
@@ -2116,33 +2289,141 @@ select.input-field option,
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
+    width: 100%;
   }
   .toolbar-left,
-  .toolbar-right {
+  .toolbar-right,
+  .partner-toolbar-right {
     width: 100%;
-    justify-content: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
-  .search-field {
+  .search-field,
+  .partner-search {
     width: 100% !important;
     max-width: 100% !important;
     margin-left: 0 !important;
   }
+  .partner-sort-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 40px !important;
+    font-size: 13.5px !important;
+  }
   .segmented-control,
   .filter-pills {
     width: 100%;
-    flex-wrap: wrap;
-    overflow: hidden;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    gap: 4px;
+  }
+  .segmented-control::-webkit-scrollbar {
+    display: none;
   }
   .seg-btn {
-    flex: 1 1 auto;
+    flex: 1 0 auto;
+    white-space: nowrap;
+    padding: 7px 12px;
+    font-size: 12.5px;
     justify-content: center;
   }
 
-  /* Partner tables/grids & all data-tables on mobile: fixed width, zero scrolling */
+  /* Partner Media Grid on Mobile */
   .partner-media-grid,
   .fixed-card-grid {
     grid-template-columns: 1fr !important;
     max-width: 100% !important;
+    width: 100% !important;
+    gap: 14px !important;
+  }
+  .partner-card-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .partner-preview-btn {
+    width: 100%;
+    justify-content: center;
+    height: 36px;
+    font-size: 12.5px;
+  }
+  .partner-card-actions {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+  .partner-card-actions > .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+    height: 38px;
+    font-size: 13px;
+  }
+  .partner-card-actions > .icon-btn {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+  }
+
+  /* Partner Modals on Mobile */
+  .preview-modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .preview-modal-status {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .preview-modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 8px;
+  }
+  .preview-modal-actions > .btn {
+    width: 100%;
+    justify-content: center;
+    height: 42px;
+    font-size: 13px;
+  }
+
+  .duration-video-full-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .duration-video-full-btn {
+    width: 100%;
+    justify-content: center;
+    height: 38px;
+    font-size: 13px;
+  }
+  .duration-shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+    gap: 6px;
+  }
+  .duration-shortcuts-grid > .btn {
+    justify-content: center;
+    height: 34px;
+    font-size: 11.5px;
+    padding: 0 4px;
+  }
+  .duration-modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .duration-modal-footer > .btn {
+    width: 100%;
+    height: 42px;
+    justify-content: center;
   }
   .table-scroll,
   .table-container {

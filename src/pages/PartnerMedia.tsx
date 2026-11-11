@@ -798,19 +798,18 @@ export default function PartnerMedia() {
 
       {/* Terminal Autonomy Quota Card */}
       {linkedTerminals.length > 0 ? (
-        <div className="card" style={{ marginBottom: '20px' }}>
-          <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="card partner-quota-card" style={{ marginBottom: '20px' }}>
+          <div className="card-body">
+            <div className="partner-quota-header">
+              <div className="partner-quota-info">
                 <div className="entity-avatar">
                   <Tv size={15} />
                 </div>
-                <div>
+                <div className="partner-quota-details">
                   <div className="card-title">Sintonia da Grade por Terminal</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
+                  <div className="partner-quota-controls">
                     <select
-                      className="select-field"
-                      style={{ width: 'auto', minWidth: 'min(100%, 220px)', maxWidth: '100%', height: '30px', fontSize: '12.5px' }}
+                      className="select-field partner-terminal-select"
                       value={selectedTerminalId}
                       onChange={e => handleTerminalChange(e.target.value)}
                     >
@@ -827,7 +826,7 @@ export default function PartnerMedia() {
                     {activeTerminal && (
                       <button
                         type="button"
-                        className="btn btn-secondary btn-sm"
+                        className="btn btn-secondary btn-sm partner-reboot-btn"
                         onClick={() => handleRebootTerminal(activeTerminal)}
                         title="Forçar reinicialização remota do app na TV"
                       >
@@ -839,7 +838,7 @@ export default function PartnerMedia() {
                 </div>
               </div>
 
-              <div style={{ textAlign: 'right' }}>
+              <div className="partner-quota-stat">
                 <div className="kpi-label">Ocupação da Cota de Mídias</div>
                 <div className="kpi-value" style={{ fontSize: '20px', marginTop: '2px' }}>
                   {currentPartnerCount}{' '}
@@ -848,7 +847,7 @@ export default function PartnerMedia() {
               </div>
             </div>
 
-            <div className="progress-bar">
+            <div className="progress-bar" style={{ marginTop: '14px' }}>
               <div
                 className="progress-fill accent"
                 style={{ width: `${Math.min(100, (currentPartnerCount / maxPartnerSlots) * 100)}%` }}
@@ -866,7 +865,7 @@ export default function PartnerMedia() {
       )}
 
       {/* Toolbar */}
-      <div className="toolbar">
+      <div className="toolbar partner-toolbar">
         <div className="toolbar-left">
           <div className="segmented-control">
             <button
@@ -904,8 +903,8 @@ export default function PartnerMedia() {
           </div>
         </div>
 
-        <div className="toolbar-right">
-          <div className="search-field" style={{ width: '250px' }}>
+        <div className="toolbar-right partner-toolbar-right">
+          <div className="search-field partner-search">
             <Search size={14} className="search-field-icon" />
             <input
               type="text"
@@ -925,8 +924,7 @@ export default function PartnerMedia() {
           </div>
 
           <select
-            className="select-field"
-            style={{ width: '160px', height: '34px' }}
+            className="select-field partner-sort-select"
             value={sortBy}
             onChange={(e: any) => setSortBy(e.target.value)}
           >
@@ -955,15 +953,7 @@ export default function PartnerMedia() {
           </div>
         </div>
       ) : (
-        <div
-          className="partner-media-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 290px))',
-            gap: '14px',
-            maxWidth: '920px'
-          }}
-        >
+        <div className="partner-media-grid">
           {filteredMedia.map(file => {
             const inTv = isMediaInPlaylist(file.id);
             const isVideo = isVideoFile(file);
@@ -977,7 +967,7 @@ export default function PartnerMedia() {
             return (
               <div
                 key={file.id}
-                className="card card-interactive"
+                className="card card-interactive partner-media-card"
                 style={{
                   overflow: 'hidden',
                   display: 'flex',
@@ -1128,27 +1118,18 @@ export default function PartnerMedia() {
                     </button>
                   </div>
 
-                  <div
-                    style={{
-                      marginTop: 'auto',
-                      paddingTop: '10px',
-                      borderTop: '1px solid var(--border-subtle)',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                  >
+                  {/* Card Action Footer */}
+                  <div className="partner-card-footer">
                     <button
                       type="button"
-                      className="btn btn-ghost btn-sm"
+                      className="btn btn-ghost btn-sm partner-preview-btn"
                       onClick={() => handleOpenPreview(file)}
                     >
                       <Eye size={12} />
                       <span>Visualizar</span>
                     </button>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div className="partner-card-actions">
                       {linkedTerminals.length > 0 && (
                         inTv ? (
                           <button
@@ -1243,8 +1224,8 @@ export default function PartnerMedia() {
               )}
             </div>
 
-            <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
-              <div>
+            <div className="modal-footer preview-modal-footer">
+              <div className="preview-modal-status">
                 {isMediaInPlaylist(previewMedia.id) ? (
                   <span className="badge badge-success">
                     <span className="status-dot online" />
@@ -1255,7 +1236,7 @@ export default function PartnerMedia() {
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <div className="preview-modal-actions">
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
@@ -1314,7 +1295,7 @@ export default function PartnerMedia() {
       {/* Modal de Ajuste de Tempo de Exibição */}
       {editingDurationMedia && (
         <div className="modal-overlay" onClick={() => !savingDuration && setEditingDurationMedia(null)}>
-          <div className="modal modal-md" onClick={e => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+          <div className="modal modal-md duration-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '520px' }}>
             <div className="modal-header">
               <div>
                 <h2 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1385,30 +1366,19 @@ export default function PartnerMedia() {
 
                 {/* Opção Rápida: Colocar tempo do vídeo completo */}
                 {isVideoFile(editingDurationMedia) && (
-                  <div
-                    style={{
-                      background: 'var(--accent-glow, rgba(212, 255, 0, 0.08))',
-                      border: '1px solid var(--accent, #d4ff00)',
-                      borderRadius: 'var(--r-md, 8px)',
-                      padding: '12px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '12px'
-                    }}
-                  >
+                  <div className="duration-video-full-card">
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: '12.5px', color: 'var(--text-primary)' }}>
+                      <div className="duration-video-full-title">
                         Exibir Vídeo Completo
                       </div>
-                      <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                      <div className="duration-video-full-subtitle">
                         Tocar do início ao fim sem cortar
                         {detectedVideoDuration ? ` (${formatDurationBadge(detectedVideoDuration)})` : ''}
                       </div>
                     </div>
                     <button
                       type="button"
-                      className="btn btn-primary btn-sm"
+                      className="btn btn-primary btn-sm duration-video-full-btn"
                       onClick={() => setCustomDuration(detectedVideoDuration || 300)}
                     >
                       Usar Vídeo Completo
@@ -1430,7 +1400,7 @@ export default function PartnerMedia() {
                     max="3600"
                     step="1"
                     className="input-field"
-                    style={{ fontSize: '16px', fontWeight: 600, height: '42px' }}
+                    style={{ fontSize: '16px', fontWeight: 600, height: '44px' }}
                     value={customDuration}
                     onChange={e => setCustomDuration(parseInt(e.target.value, 10) || 0)}
                     required
@@ -1447,7 +1417,7 @@ export default function PartnerMedia() {
                   <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
                     Atalhos rápidos:
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <div className="duration-shortcuts-grid">
                     {[10, 15, 30, 45, 60, 120, 300].map(sec => (
                       <button
                         key={sec}
@@ -1471,7 +1441,7 @@ export default function PartnerMedia() {
                 </div>
               </div>
 
-              <div className="modal-footer">
+              <div className="modal-footer duration-modal-footer">
                 <button
                   type="button"
                   className="btn btn-ghost"
