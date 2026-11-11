@@ -80,9 +80,7 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      // Limit each range chunk to at most 16 MB for fast edge streaming
-      const MAX_RANGE_BYTES = 16 * 1024 * 1024;
-      const end = Math.min(requestedEnd, start + MAX_RANGE_BYTES - 1, totalSize - 1);
+      const end = Math.min(requestedEnd, totalSize - 1);
       const contentLength = end - start + 1;
 
       const startChunkIdx = Math.floor(start / chunkSize);

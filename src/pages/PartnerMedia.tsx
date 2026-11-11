@@ -27,7 +27,8 @@ import {
   Film,
   Image as ImageIcon,
   RefreshCw,
-  PauseCircle
+  PauseCircle,
+  Clock
 } from 'lucide-react';
 
 interface MediaFile {
@@ -41,6 +42,7 @@ interface MediaFile {
   size?: number;
   url?: string;
   publicUrl?: string;
+  duration_seconds?: number;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
 }
@@ -94,6 +96,94 @@ export default function PartnerMedia() {
   const [filterType, setFilterType] = useState<'all' | 'in_tv' | 'videos' | 'images' | 'approved'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest');
   const [previewMedia, setPreviewMedia] = useState<MediaFile | null>(null);
+
+  // Duration Modal State
+  const [editingDurationMedia, setEditingDurationMedia] = useState<MediaFile | null>(null);
+  const [customDuration, setCustomDuration] = useState<number>(15);
+  const [detectedVideoDuration, setDetectedVideoDuration] = useState<number | null>(null);
+  const [savingDuration, setSavingDuration] = useState<boolean>(false);
+
+  const formatDurationBadge = (seconds?: number | null) => {
+    const s = Math.max(1, Math.round(seconds || 15));
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    if (rem === 0) return `${m} min (${s}s)`;
+    return `${m}m ${rem}s (${s}s)`;
+  };
+
+  const handleOpenDurationModal = (file: MediaFile) => {
+    setEditingDurationMedia(file);
+    const initial = file.duration_seconds && file.duration_seconds > 0 ? file.duration_seconds : 15;
+    setCustomDuration(initial);
+    setDetectedVideoDuration(null);
+
+    // Se for vídeo, tenta ler a duração nativa do arquivo via elemento de vídeo
+    if (isVideoFile(file)) {
+      const mediaUrl = file.publicUrl || file.url;
+      if (mediaUrl) {
+        try {
+          const v = document.createElement('video');
+          v.preload = 'metadata';
+          v.onloadedmetadata = () => {
+            const dur = Math.round(v.duration);
+            if (dur > 0 && Number.isFinite(dur)) {
+              setDetectedVideoDuration(dur);
+            }
+          };
+          v.src = mediaUrl;
+        } catch {
+          // ignore
+        }
+      }
+    }
+  };
+
+  const handleSaveDuration = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!editingDurationMedia) return;
+
+    const seconds = Math.max(1, Math.min(3600, Math.round(customDuration || 15)));
+    setSavingDuration(true);
+    try {
+      const { error: updErr } = await supabase
+        .from('media_files')
+        .update({ duration_seconds: seconds })
+        .eq('id', editingDurationMedia.id);
+
+      if (updErr) {
+        throw updErr;
+      }
+
+      // Atualiza também em playlist_items caso esteja vinculado
+      try {
+        await supabase
+          .from('playlist_items')
+          .update({ duration_override: seconds })
+          .eq('media_id', editingDurationMedia.id);
+      } catch {}
+
+      // Incrementa a versão da playlist para a TV atualizar imediatamente
+      if (playlist?.id) {
+        const currentVersion = playlist.version || 1;
+        await supabase.from('playlists').update({ version: currentVersion + 1 }).eq('id', playlist.id);
+      }
+
+      setMediaFiles(prev =>
+        prev.map(m => (m.id === editingDurationMedia.id ? { ...m, duration_seconds: seconds } : m))
+      );
+      if (previewMedia?.id === editingDurationMedia.id) {
+        setPreviewMedia(prev => (prev ? { ...prev, duration_seconds: seconds } : null));
+      }
+
+      setEditingDurationMedia(null);
+    } catch (err: any) {
+      console.error('Erro ao atualizar tempo de exibição:', err);
+      alert('Erro ao atualizar tempo de exibição: ' + (err.message || 'Erro desconhecido'));
+    } finally {
+      setSavingDuration(false);
+    }
+  };
 
   const handleOpenPreview = async (file: MediaFile) => {
     let playUrl = file.publicUrl || file.url;
@@ -268,6 +358,39 @@ export default function PartnerMedia() {
     await loadPlaylistForTerminal(terminalId);
   };
 
+  const detectMediaDuration = (file: File): Promise<number> => {
+    return new Promise((resolve) => {
+      const isVideo =
+        file.type.startsWith('video/') ||
+        file.name.toLowerCase().endsWith('.mp4') ||
+        file.name.toLowerCase().endsWith('.mov') ||
+        file.name.toLowerCase().endsWith('.m4v');
+
+      if (!isVideo) {
+        // Padrão para imagens: 15s
+        return resolve(15);
+      }
+
+      try {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        const objectUrl = URL.createObjectURL(file);
+        video.onloadedmetadata = () => {
+          URL.revokeObjectURL(objectUrl);
+          const dur = Math.round(video.duration);
+          resolve(dur > 0 && Number.isFinite(dur) ? dur : 15);
+        };
+        video.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          resolve(15);
+        };
+        video.src = objectUrl;
+      } catch {
+        resolve(15);
+      }
+    });
+  };
+
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !partnerId || !user) return;
@@ -275,7 +398,10 @@ export default function PartnerMedia() {
     try {
       setUploading(true);
       setUploadProgress(1);
-      setUploadLabel('Preparando envio...');
+      setUploadLabel('Detectando duração e preparando envio...');
+
+      // Detecta a duração total do vídeo ou define padrão para imagens
+      const detectedDuration = await detectMediaDuration(file);
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
@@ -315,6 +441,7 @@ export default function PartnerMedia() {
         file_path: filePath,
         file_type: validFileType,
         file_size: file.size,
+        duration_seconds: detectedDuration,
         checksum: simpleChecksum,
         partner_id: partnerId,
         status: 'approved'
@@ -964,6 +1091,43 @@ export default function PartnerMedia() {
                     </div>
                   </div>
 
+                  {/* Tempo de exibição configurado na TV */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: 'var(--bg-subtle, rgba(255,255,255,0.03))',
+                      padding: '6px 10px',
+                      borderRadius: 'var(--r-md, 8px)',
+                      border: '1px solid var(--border-subtle)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Clock size={13} style={{ color: 'var(--accent)' }} />
+                      <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>Tempo na TV:</span>
+                      <strong
+                        style={{
+                          fontSize: '12px',
+                          color: 'var(--text-primary)',
+                          fontFamily: 'var(--font-mono)'
+                        }}
+                      >
+                        {formatDurationBadge(file.duration_seconds)}
+                      </strong>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      style={{ height: '24px', padding: '0 8px', fontSize: '11px' }}
+                      onClick={() => handleOpenDurationModal(file)}
+                      title="Alterar o tempo que este conteúdo fica na TV"
+                    >
+                      Alterar
+                    </button>
+                  </div>
+
                   <div
                     style={{
                       marginTop: 'auto',
@@ -1094,6 +1258,15 @@ export default function PartnerMedia() {
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <button
                   type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleOpenDurationModal(previewMedia)}
+                  title="Alterar tempo de exibição na TV"
+                >
+                  <Clock size={13} />
+                  <span>Ajustar Tempo ({formatDurationBadge(previewMedia.duration_seconds)})</span>
+                </button>
+                <button
+                  type="button"
                   className="btn btn-ghost"
                   style={{ color: 'var(--danger)' }}
                   onClick={() => handleDeleteMedia(previewMedia)}
@@ -1134,6 +1307,189 @@ export default function PartnerMedia() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Ajuste de Tempo de Exibição */}
+      {editingDurationMedia && (
+        <div className="modal-overlay" onClick={() => !savingDuration && setEditingDurationMedia(null)}>
+          <div className="modal modal-md" onClick={e => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+            <div className="modal-header">
+              <div>
+                <h2 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Clock size={18} style={{ color: 'var(--accent)' }} />
+                  <span>Tempo de Exibição na TV</span>
+                </h2>
+                <p className="modal-subtitle">
+                  Defina por quantos segundos esta mídia será exibida a cada ciclo da grade.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="icon-btn"
+                disabled={savingDuration}
+                onClick={() => setEditingDurationMedia(null)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveDuration}>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Cartão informativo da mídia */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    background: 'var(--bg-subtle, rgba(255,255,255,0.03))',
+                    borderRadius: 'var(--r-md, 8px)',
+                    border: '1px solid var(--border-subtle)'
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '8px',
+                      background: 'rgba(0,0,0,0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--accent)',
+                      flexShrink: 0
+                    }}
+                  >
+                    {isVideoFile(editingDurationMedia) ? <Film size={20} /> : <ImageIcon size={20} />}
+                  </div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        fontSize: '13.5px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
+                    >
+                      {editingDurationMedia.name || editingDurationMedia.original_name}
+                    </div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                      {isVideoFile(editingDurationMedia) ? 'Arquivo de Vídeo MP4' : 'Arquivo de Imagem'}
+                      {detectedVideoDuration ? ` · Duração original do arquivo: ${formatDurationBadge(detectedVideoDuration)}` : ''}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Opção Rápida: Colocar tempo do vídeo completo */}
+                {isVideoFile(editingDurationMedia) && (
+                  <div
+                    style={{
+                      background: 'var(--accent-glow, rgba(212, 255, 0, 0.08))',
+                      border: '1px solid var(--accent, #d4ff00)',
+                      borderRadius: 'var(--r-md, 8px)',
+                      padding: '12px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px'
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '12.5px', color: 'var(--text-primary)' }}>
+                        Exibir Vídeo Completo
+                      </div>
+                      <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        Tocar do início ao fim sem cortar
+                        {detectedVideoDuration ? ` (${formatDurationBadge(detectedVideoDuration)})` : ''}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => setCustomDuration(detectedVideoDuration || 300)}
+                    >
+                      Usar Vídeo Completo
+                    </button>
+                  </div>
+                )}
+
+                {/* Campo de Tempo em Segundos */}
+                <div className="input-group">
+                  <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Duração de Exibição (segundos)</span>
+                    <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
+                      {formatDurationBadge(customDuration)}
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    min="3"
+                    max="3600"
+                    step="1"
+                    className="input-field"
+                    style={{ fontSize: '16px', fontWeight: 600, height: '42px' }}
+                    value={customDuration}
+                    onChange={e => setCustomDuration(parseInt(e.target.value, 10) || 0)}
+                    required
+                  />
+                  <span className="input-hint" style={{ fontSize: '11.5px', color: 'var(--text-tertiary)' }}>
+                    {isVideoFile(editingDurationMedia)
+                      ? 'Dica: Se definir um tempo menor que o vídeo, a TV avançará após atingir essa duração.'
+                      : 'Recomendado para imagens: entre 10 e 30 segundos.'}
+                  </span>
+                </div>
+
+                {/* Botões de Seleção Rápida */}
+                <div>
+                  <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                    Atalhos rápidos:
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {[10, 15, 30, 45, 60, 120, 300].map(sec => (
+                      <button
+                        key={sec}
+                        type="button"
+                        className={`btn btn-sm ${customDuration === sec ? 'btn-primary' : 'btn-secondary'}`}
+                        onClick={() => setCustomDuration(sec)}
+                      >
+                        {formatDurationBadge(sec)}
+                      </button>
+                    ))}
+                    {detectedVideoDuration && ![10, 15, 30, 45, 60, 120, 300].includes(detectedVideoDuration) && (
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${customDuration === detectedVideoDuration ? 'btn-primary' : 'btn-secondary'}`}
+                        onClick={() => setCustomDuration(detectedVideoDuration)}
+                      >
+                        Vídeo ({formatDurationBadge(detectedVideoDuration)})
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  disabled={savingDuration}
+                  onClick={() => setEditingDurationMedia(null)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={savingDuration || customDuration <= 0}
+                >
+                  {savingDuration ? <div className="loader" /> : <Check size={14} />}
+                  <span>{savingDuration ? 'Salvando...' : 'Salvar Tempo na TV'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
