@@ -8,7 +8,7 @@ interface ThemeState {
   toggleTheme: () => void;
 }
 
-const STORAGE_KEY = '@elevate_theme_v2';
+const STORAGE_KEY = '@elevate_theme_v3';
 
 const getInitialTheme = (): Theme => {
   if (typeof window === 'undefined') return 'light';

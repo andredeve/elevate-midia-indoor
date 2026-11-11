@@ -380,17 +380,29 @@
 
 .opt-input {
   width: 100%;
-  background: rgba(10, 11, 14, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 12px;
   padding: 13px 16px 13px 44px;
   font-size: 15px;
-  color: #ffffff;
+  color: #0f172a;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .opt-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  background: #ffffff;
+}
+
+html[data-theme="dark"] .opt-input {
+  background: rgba(10, 11, 14, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .opt-input:focus {
   border-color: #c084fc;
   box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
   background: #0a0b0e;
