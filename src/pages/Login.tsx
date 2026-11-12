@@ -100,16 +100,18 @@ export default function Login() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div className="input-group">
             <label className="input-label" htmlFor="email">
-              E-mail
+              Login ou E-mail
             </label>
             <input
               id="email"
-              type="email"
+              type="text"
               className="input-field"
-              placeholder="nome@empresa.com"
+              placeholder="Digite seu login ou e-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
+              autoComplete="username"
+              autoCapitalize="none"
+              spellCheck={false}
               required
             />
           </div>

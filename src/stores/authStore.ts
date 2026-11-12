@@ -13,6 +13,18 @@ interface AuthState {
 
 const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
 
+const LOGIN_ALIASES: Record<string, string> = {
+  adm: 'adm@elevatemidiaindoor.com',
+};
+
+/**
+ * Converte logins curtos (ex: 'adm') para o e-mail correspondente no Supabase Auth.
+ */
+export function resolveLoginEmail(loginOrEmail: string): string {
+  const normalized = loginOrEmail.trim().toLowerCase();
+  return LOGIN_ALIASES[normalized] || normalized;
+}
+
 async function fetchUserRole(user: User, accessToken?: string): Promise<string> {
   const fallbackRole =
     (user.app_metadata?.role as string) ||
@@ -95,7 +107,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         localStorage.removeItem('sb-prlhdjpzflgjtlmknhps-auth-token');
       } catch {}
 
-      const cleanEmail = email.trim().toLowerCase();
+      const cleanEmail = resolveLoginEmail(email);
       const cleanPassword = password.trim();
 
       let { data, error } = await supabase.auth.signInWithPassword({
@@ -127,7 +139,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (error) {
         console.error('[Auth] SignIn error:', error.message);
         set({ loading: false });
-        return { error: error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message };
+        return { error: error.message === 'Invalid login credentials' ? 'Login ou senha incorretos.' : error.message };
       }
 
       if (!data?.user) {
