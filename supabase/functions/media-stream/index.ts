@@ -116,41 +116,33 @@ Deno.serve(async (req: Request) => {
         });
       }
 
-      // Multi-part range path: stream across chunk boundary
-      const stream = new ReadableStream({
-        async start(controller) {
-          try {
-            for (let idx = startChunkIdx; idx <= endChunkIdx; idx++) {
-              const partGlobalStart = idx * chunkSize;
-              const partGlobalEnd = Math.min((idx + 1) * chunkSize - 1, totalSize - 1);
-              const sliceStart = Math.max(start, partGlobalStart) - partGlobalStart;
-              const sliceEnd = Math.min(end, partGlobalEnd) - partGlobalStart;
+      // Multi-part range path: stream across chunk boundary with native backpressure
+      const { readable, writable } = new TransformStream();
+      (async () => {
+        try {
+          for (let idx = startChunkIdx; idx <= endChunkIdx; idx++) {
+            const partGlobalStart = idx * chunkSize;
+            const partGlobalEnd = Math.min((idx + 1) * chunkSize - 1, totalSize - 1);
+            const sliceStart = Math.max(start, partGlobalStart) - partGlobalStart;
+            const sliceEnd = Math.min(end, partGlobalEnd) - partGlobalStart;
 
-              const partUrl = publicObjectUrl(bucket, partPath(basePath, idx));
-              const upstream = await fetch(partUrl, {
-                headers: { Range: `bytes=${sliceStart}-${sliceEnd}` },
-              });
+            const partUrl = publicObjectUrl(bucket, partPath(basePath, idx));
+            const upstream = await fetch(partUrl, {
+              headers: { Range: `bytes=${sliceStart}-${sliceEnd}` },
+            });
 
-              if (!upstream.ok || !upstream.body) {
-                controller.error(new Error(`Failed fetching part ${idx}: ${upstream.status}`));
-                return;
-              }
-
-              const reader = upstream.body.getReader();
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                if (value) controller.enqueue(value);
-              }
+            if (!upstream.ok || !upstream.body) {
+              throw new Error(`Failed fetching part ${idx}: ${upstream.status}`);
             }
-            controller.close();
-          } catch (err) {
-            controller.error(err);
-          }
-        },
-      });
 
-      return new Response(stream, {
+            await upstream.body.pipeTo(writable, { preventClose: idx < endChunkIdx });
+          }
+        } catch (err) {
+          writable.abort(err).catch(() => {});
+        }
+      })();
+
+      return new Response(readable, {
         status: 206,
         headers: {
           ...corsHeaders,
@@ -163,32 +155,24 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Full file download (no Range header) — streams all parts sequentially
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for (let idx = 0; idx < totalChunks; idx++) {
-            const partUrl = publicObjectUrl(bucket, partPath(basePath, idx));
-            const upstream = await fetch(partUrl);
-            if (!upstream.ok || !upstream.body) {
-              controller.error(new Error(`Failed fetching part ${idx}: ${upstream.status}`));
-              return;
-            }
-            const reader = upstream.body.getReader();
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              if (value) controller.enqueue(value);
-            }
+    // Full file download (no Range header) — streams all parts sequentially with native backpressure
+    const { readable, writable } = new TransformStream();
+    (async () => {
+      try {
+        for (let idx = 0; idx < totalChunks; idx++) {
+          const partUrl = publicObjectUrl(bucket, partPath(basePath, idx));
+          const upstream = await fetch(partUrl);
+          if (!upstream.ok || !upstream.body) {
+            throw new Error(`Failed fetching part ${idx}: ${upstream.status}`);
           }
-          controller.close();
-        } catch (err) {
-          controller.error(err);
+          await upstream.body.pipeTo(writable, { preventClose: idx < totalChunks - 1 });
         }
-      },
-    });
+      } catch (err) {
+        writable.abort(err).catch(() => {});
+      }
+    })();
 
-    return new Response(stream, {
+    return new Response(readable, {
       status: 200,
       headers: {
         ...corsHeaders,
