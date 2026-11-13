@@ -14,7 +14,8 @@ interface AuthState {
 const DEFAULT_ORG_ID = '00000000-0000-0000-0000-000000000001';
 
 const LOGIN_ALIASES: Record<string, string> = {
-  adm: 'adm@elevatemidiaindoor.com',
+  adm: 'adm@elevate.com',
+  'adm@elevatemidiaindoor.com': 'adm@elevate.com',
 };
 
 /**
