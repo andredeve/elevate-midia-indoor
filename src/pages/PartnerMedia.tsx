@@ -989,8 +989,8 @@ export default function PartnerMedia() {
                   {isVideo ? (
                     <>
                       <video
-                        src={`${mediaUrl}#t=0.1`}
-                        preload="metadata"
+                        src={mediaUrl}
+                        preload="none"
                         muted
                         playsInline
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}

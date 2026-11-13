@@ -90,14 +90,6 @@ export default function Terminals() {
       if (termRes.data && !termRes.error) {
         const list = termRes.data as Terminal[];
         setTerminals(list);
-
-        // Se algum terminal estiver com status 'online' no banco mas sem heartbeat recente, corrige para 'offline' no banco
-        const now = Date.now();
-        list.forEach((t) => {
-          if (t.status === 'online' && !isTerminalOnline(t, now)) {
-            supabase.from('terminals').update({ status: 'offline' }).eq('id', t.id).then(() => {});
-          }
-        });
       }
       if (partRes.data) {
         setPartners(partRes.data as PartnerOption[]);
@@ -111,24 +103,22 @@ export default function Terminals() {
 
     const subscription = supabase
       .channel('terminals-status')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'terminals' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'terminals' }, (payload: any) => {
         setNowTick(Date.now());
-        loadTerminals();
+        if (payload.eventType === 'UPDATE' && payload.new) {
+          // Atualiza em memória preservando os dados aninhados de parceiro
+          setTerminals((prev) =>
+            prev.map((t) => (t.id === payload.new.id ? { ...t, ...payload.new, partners: t.partners } : t))
+          );
+        } else {
+          loadTerminals();
+        }
       })
       .subscribe();
 
-    // Reavalia periodicamente o timeout de heartbeat (a cada 10s) para detectar queda de conexão imediatamente
+    // Reavalia periodicamente o timeout de heartbeat (a cada 10s) em memória para a UI
     const tickInterval = setInterval(() => {
-      const now = Date.now();
-      setNowTick(now);
-      setTerminals((prev) => {
-        prev.forEach((t) => {
-          if (t.status === 'online' && !isTerminalOnline(t, now)) {
-            supabase.from('terminals').update({ status: 'offline' }).eq('id', t.id).then(() => {});
-          }
-        });
-        return [...prev];
-      });
+      setNowTick(Date.now());
     }, 10000);
 
     return () => {

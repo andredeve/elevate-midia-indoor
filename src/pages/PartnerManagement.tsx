@@ -2247,10 +2247,10 @@ export default function PartnerManagement() {
                                       {item.playUrl ? (
                                         isVideo ? (
                                           <video
-                                            src={`${item.playUrl}#t=0.1`}
+                                            src={item.playUrl}
                                             muted
                                             playsInline
-                                            preload="metadata"
+                                            preload="none"
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                           />
                                         ) : (
@@ -2458,10 +2458,10 @@ export default function PartnerManagement() {
                                         {media.playUrl ? (
                                           isVideo ? (
                                             <video
-                                              src={`${media.playUrl}#t=0.1`}
+                                              src={media.playUrl}
                                               muted
                                               playsInline
-                                              preload="metadata"
+                                              preload="none"
                                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                             />
                                           ) : (

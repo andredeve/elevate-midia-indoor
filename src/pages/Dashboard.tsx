@@ -32,13 +32,15 @@ export default function Dashboard() {
           .select('*', { count: 'exact', head: true })
           .eq('event_type', 'playback_start');
 
-        // 2. Busca os últimos 5000 logs ordenados por data (para que os de HOJE nunca sejam cortados pelo limite de 1000)
+        // 2. Otimização de Egress: Busca apenas colunas necessárias dos últimos 7 dias (para o gráfico e ranking semanal)
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
         const { data: logsData } = await supabase
           .from('terminal_logs')
-          .select('*')
+          .select('id, terminal_id, created_at, metadata')
           .eq('event_type', 'playback_start')
+          .gte('created_at', sevenDaysAgo)
           .order('created_at', { ascending: false })
-          .limit(5000);
+          .limit(2000);
 
         setTerminals(terminalsData || []);
         setLogs(logsData || []);
@@ -76,9 +78,17 @@ export default function Dashboard() {
           schema: 'public',
           table: 'terminals'
         },
-        async () => {
-          const { data: terminalsData } = await supabase.from('terminals').select('*');
-          if (terminalsData) setTerminals(terminalsData);
+        (payload: any) => {
+          // Otimização de Egress: atualiza apenas em memória com o payload, sem refazer select('*') do banco a cada heartbeat
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            setTerminals((prev) =>
+              prev.map((t) => (t.id === payload.new.id ? { ...t, ...payload.new } : t))
+            );
+          } else if (payload.eventType === 'INSERT' && payload.new) {
+            setTerminals((prev) => [...prev, payload.new]);
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            setTerminals((prev) => prev.filter((t) => t.id !== payload.old.id));
+          }
           setNowTick(Date.now());
         }
       )

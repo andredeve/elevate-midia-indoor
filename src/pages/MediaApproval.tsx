@@ -347,8 +347,8 @@ export default function MediaApproval() {
                 >
                   {isVideo ? (
                     <video
-                      src={`${item.publicUrl}#t=0.1`}
-                      preload="auto"
+                      src={item.publicUrl}
+                      preload="none"
                       muted
                       playsInline
                       crossOrigin="anonymous"

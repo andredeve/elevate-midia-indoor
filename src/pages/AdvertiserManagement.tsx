@@ -966,7 +966,8 @@ export default function AdvertiserManagement() {
                             {m.playUrl ? (
                               isVideo ? (
                                 <video
-                                  src={`${m.playUrl}#t=0.1`}
+                                  src={m.playUrl}
+                                  preload="none"
                                   muted
                                   playsInline
                                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
